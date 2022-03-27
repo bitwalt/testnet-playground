@@ -1,3 +1,12 @@
+.project
+
+?/blocks
+?/regtest/*
+?/testnet/*
+!?/regtest/server.pem
+!?/regtest/server.cert
+
+*.dat
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

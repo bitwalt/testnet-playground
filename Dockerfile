@@ -1,14 +1,7 @@
-# Based on https://raw.githubusercontent.com/freewil/bitcoin-testnet-box/master/Dockerfile
 # bitcoin-testnet-box docker image
 
 FROM ubuntu
-LABEL maintainer="Walter Maffione <waltermaffy@gmail.com>"
-
-ENV BITCOIN_CORE_VERSION "22.0"
-
-# define CPU architecture
-# x86: x86_64-linux-gnu, ARM 32bit: arm-linux-gnueabihf, ARM 64bit : aarch64-linux-gnu
-ENV ARCH "aarch64-linux-gnu"
+LABEL maintainer="Sean Lavine <lavis88@gmail.com>"
 
 # install make
 RUN apt-get update && \
@@ -19,6 +12,12 @@ RUN adduser --disabled-login --gecos "" tester
 
 # run following commands from user's home directory
 WORKDIR /home/tester
+
+# ENV BITCOIN_CORE_VERSION "0.21.0"
+ENV BITCOIN_CORE_VERSION "22.0"
+# Define chip architecture x86: x86_64-linux-gnu, ARM 32bit: arm-linux-gnueabihf, ARM 64bit : aarch64-linux-gnu
+ENV ARCH "aarch64-linux-gnu"
+
 
 # download and install bitcoin binaries
 RUN mkdir tmp \

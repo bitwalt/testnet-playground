@@ -13,7 +13,6 @@
 # make clean # remove all images and containers
 # make push # push updated images to Docker Hub (authors/maintainers only)
 
-
 # Latest tested versions of Bitcoin and Lightning clients
 
 # OS base image
@@ -34,9 +33,6 @@ CL_VER=0.10.1
 ECLAIR_VER=0.4.2
 ECLAIR_COMMIT=52444b0
 
-
-
-
 # Docker registry for lnbook
 REGISTRY=docker.com
 ORG=lnbook
@@ -45,9 +41,6 @@ ORG=lnbook
 CONTAINERS=bitcoind lnd eclair c-lightning
 
 .DEFAULT: pull
-
-
-
 
 
 build-bitcoind:
