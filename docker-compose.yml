@@ -1,31 +1,36 @@
-version: "3.3"
+version: "3.7"
+
 networks:
   lnnet:
 
 services:
-  bitcoind:
-    container_name: bitcoind
+  
+  bitcoind-t:
+    container_name: bitcoin-testnet
     build:
         context: bitcoind
-    image: lnbook/bitcoind:latest
     networks:
       - lnnet
     expose:
-      - "18443"
-      - "12005"
-      - "12006"
+      - "19011" 
+      - "19001"
+      - "18333" # Bitcoin network protocol
+      - "18332" # RPC
+    volumes:
+      - ${HD_PATH}:/data/.bitcoin
+            
     restart: always
 
-  Alice:
-    container_name: Alice
-    build:
-        context: lnd
-    image: lnbook/lnd:latest
-    networks:
-      - lnnet
-    expose:
-      - "9735"
-    restart: always
+  # Alice:
+  #   container_name: Alice
+  #   build:
+  #       context: lnd
+  #   image: lnbook/lnd:latest
+  #   networks:
+  #     - lnnet
+  #   expose:
+  #     - "9735"
+  #   restart: always
 
   # Bob:
   #   container_name: Bob
