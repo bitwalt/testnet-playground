@@ -5,10 +5,18 @@ B1_FLAGS=
 B2_FLAGS=
 B1=-datadir=1 $(B1_FLAGS)
 B2=-datadir=2 $(B2_FLAGS)
+T=-datadir=/testnet
 BLOCKS=1
 ADDRESS=
 AMOUNT=
 ACCOUNT=
+HD_PATH=/mnt/electrum/testnet
+
+start-testnet: 
+	$(BITCOIND) $(T) -daemon
+	
+stop-testnet:
+	$(BITCOINCLI) $(T) stop
 
 start:
 	$(BITCOIND) $(B1) -daemon -fallbackfee=0.0002
@@ -53,4 +61,12 @@ docker-build:
 	docker build -t bitcoin-test .
 
 docker-run:
-	docker run -t -i -p 19001:19001 -p 19011:19011 -v $(PWD):/home/tester/bitcoin-testnet-box bitcoin-test
+	docker run -it -d -p 19001:19001 -p 19011:19011 -v $(PWD):/home/tester/bitcoin-testnet-box -v $(HD_PATH):/testnet bitcoin-test 
+
+
+docker-testnet:
+	docker run -it -d -p 18333:18333 -v $(PWD):/home/tester/bitcoin-testnet-box -v $(HD_PATH):/testnet bitcoin-test 
+
+
+docker-attach:
+	docker attach --detach-keys="ctrl-a" bitcoin-test
