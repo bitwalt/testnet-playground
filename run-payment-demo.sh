@@ -138,7 +138,6 @@ wait-for-node Bob "cli listchannels | jq -e '.channels[] | select(.destination =
 echo "- Bob->Chan connected"
 echo -n "- Waiting for Chan channel confirmation..."
 wait-for-node Chan "cli channels | jq -e '.[] | select (.nodeId == \"${dina_address}\" and .state == \"NORMAL\")' > /dev/null"
-echo "- Chan->Dina connected"
 echo "All channels confirmed"
 
 

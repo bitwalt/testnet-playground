@@ -1,55 +1,51 @@
-# Based on https://raw.githubusercontent.com/freewil/bitcoin-testnet-box/master/Dockerfile
-# bitcoin-testnet-box docker image
+ARG OS=ubuntu
+ARG OS_VER=focal
+FROM ${OS}:${OS_VER} as os-base
 
-FROM ubuntu
-LABEL maintainer="Walter Maffione <waltermaffy@gmail.com>"
+# Install dependencies
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get update -qq && apt-get install -yqq \
+		curl unzip jq bash-completion
 
-# ENV BITCOIN_CORE_VERSION "22.0"
-ARG BITCOIN_CORE_VERSION
-# define CPU architecture
-# x86: x86_64-linux-gnu, ARM 32bit: arm-linux-gnueabihf, ARM 64bit : aarch64-linux-gnu
-# ENV ARCH "aarch64-linux-gnu"
+FROM os-base as bitcoind-install
 
-ARG ARCH
-# install make
-RUN apt-get update && \
-	apt-get install --yes make wget
+ARG BITCOIND_VER=0.21.0
+# Install Bitcoin Core binaries and libraries
+ARG ARCH="aarch64-linux-gnu"
+# ARG ARCH=x86_64-linux-gnu
 
-# create a non-root user
-RUN adduser --disabled-login --gecos "" tester
+RUN cd /tmp && \
+	curl -# -sLO https://bitcoincore.org/bin/bitcoin-core-${BITCOIND_VER}/bitcoin-${BITCOIND_VER}-${ARCH}.tar.gz && \
+	tar -zxf bitcoin-${BITCOIND_VER}-${ARCH}.tar.gz && \
+	cd bitcoin-${BITCOIND_VER} && \
+	install -vD bin/* /usr/bin && \
+	install -vD lib/* /usr/lib && \
+	cd /tmp && \
+	rm bitcoin-${BITCOIND_VER}-${ARCH}.tar.gz && \
+	rm -rf bitcoin-${BITCOIND_VER}
 
-# run following commands from user's home directory
-WORKDIR /home/tester
+# Install runtime scripts, bash-completion and configuration files
 
-# download and install bitcoin binaries
-RUN mkdir tmp \
-	&& cd tmp \
-	&& wget "https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_CORE_VERSION}/bitcoin-${BITCOIN_CORE_VERSION}-${ARCH}-linux-gnu.tar.gz" \
-	&& tar xzf "bitcoin-${BITCOIN_CORE_VERSION}-${ARCH}-linux-gnu.tar.gz" \
-	&& cd "bitcoin-${BITCOIN_CORE_VERSION}/bin" \
-	&& install --mode 755 --target-directory /usr/local/bin *
+# bash completion for bitcoind and bitcoin-cli
+ENV GH_URL https://raw.githubusercontent.com/bitcoin/bitcoin/master/
+ENV BC /usr/share/bash-completion/completions/
+ADD $GH_URL/contrib/bitcoin-cli.bash-completion $BC/bitcoin-cli
+ADD $GH_URL/contrib/bitcoind.bash-completion $BC/bitcoind
+ADD $GH_URL/contrib/bitcoin-tx.bash-completion $BC/bitcoin-tx
 
-# clean up
-RUN rm -r tmp
+# Copy bitcoind configuration directory
+COPY bitcoind /bitcoind
+RUN ln -s /bitcoind /root/.
 
-# copy the testnet-box files into the image
-ADD . /home/tester/bitcoin-testnet-box
+# Copy support scripts
+COPY bashrc /root/.bashrc
+COPY bitcoind-entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/bitcoind-entrypoint.sh
+COPY mine.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/mine.sh
+COPY cli /usr/local/bin
+RUN chmod +x /usr/local/bin/cli
 
-# make tester user own the bitcoin-testnet-box
-RUN chown -R tester:tester /home/tester/bitcoin-testnet-box
-
-# color PS1
-RUN mv /home/tester/bitcoin-testnet-box/.bashrc /home/tester/ && \
-	cat /home/tester/.bashrc >> /etc/bash.bashrc
-
-# use the tester user when running the image
-USER tester
-
-# run commands from inside the testnet-box directory
-WORKDIR /home/tester/bitcoin-testnet-box
-
-# expose rpc ports for the nodes to allow outside container access
-EXPOSE 19001 19011 18333 18332 
 # bitcoind P2P
 EXPOSE 18444/tcp
 # bitcoind regtest RPC
@@ -59,4 +55,8 @@ EXPOSE 12005/tcp
 # zmqpubrawtx
 EXPOSE 12006/tcp
 
-CMD ["/bin/bash"]
+WORKDIR /bitcoind
+ENTRYPOINT ["/usr/local/bin/bitcoind-entrypoint.sh"]
+
+# Mine new block every 10 seconds
+CMD ["/usr/local/bin/mine.sh"]

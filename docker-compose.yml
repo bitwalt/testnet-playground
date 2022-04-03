@@ -2,64 +2,65 @@ version: "3.7"
 
 services:
   
-  # bitcoin:
-  #   container_name: bitcoin-testnet
-  #   build:
-  #       context: bitcoind
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "18333" # Bitcoin network protocol
-  #     - "18332" # RPC
-  #     - "18443" # Regtest
-  #     - "12005"
-  #     - "12006"
-  #   volumes:
-  #     - ${BITCOIN_PATH}:/data/.bitcoin
-            
-  #   restart: always
-
-  # alice:
-  #   container_name: alice-ln
-  #   build:
-  #       context: lnd
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
-
-  # bob:
-  #   container_name: bob-ln
-  #   build:
-  #       context: lnd
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
-
-  jupyter:
+  bitcoind:
+    container_name: bitcoind
     build:
-      context: ./jupyter
-    image: jupyter
-    container_name: jupyter
-    hostname: jupyter
-    ports:
-      - "8888:8888"
+        context: bitcoind
     networks:
       - lnnet
-    volumes:
-      - ./notebook:/notebook
-      - ./volumes:/lnd_share
-    command: >
-      /bin/sh -c "jupyter notebook \
-        --ip='*' \
-        --no-browser \
-        --NotebookApp.notebook_dir='/notebook' \
-        --NotebookApp.token='' \
-        --NotebookApp.password=''"
+    expose:
+      - "18443"
+      - "12005"
+      - "12006"
+    restart: always
+      
+  alice:
+    container_name: alice-ln
+    build:
+        context: lnd
+    networks:
+      - lnnet
+    expose:
+      - "9735"
+    restart: always
 
+  bob:
+    container_name: bob-ln
+    build:
+        context: lnd
+    networks:
+      - lnnet
+    expose:
+      - "9735"
+    restart: always
+
+  chan:
+    container_name: chan-ln
+    build:
+        context: lnd
+    networks:
+      - lnnet
+    expose:
+      - "9735"
+    restart: always
+  
+
+  # jupyter:
+  #   build: 
+  #     context: jupyter
+  #   container_name: jupyter
+  #   hostname: jupyter
+  #   networks:
+  #     - lnnet    
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - ./notebook:/home/jovyan/work
+  #     - ./volumes:/lnd_share
+  #   command: "start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
+  #   logging:
+  #     driver: none
+    
 networks:
   lnnet:
     external: true
