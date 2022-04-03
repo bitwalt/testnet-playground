@@ -1,66 +1,65 @@
 version: "3.7"
 
-networks:
-  lnnet:
-
 services:
   
-  bitcoind-t:
-    container_name: bitcoin-testnet
+  # bitcoin:
+  #   container_name: bitcoin-testnet
+  #   build:
+  #       context: bitcoind
+  #   networks:
+  #     - lnnet
+  #   expose:
+  #     - "18333" # Bitcoin network protocol
+  #     - "18332" # RPC
+  #     - "18443" # Regtest
+  #     - "12005"
+  #     - "12006"
+  #   volumes:
+  #     - ${BITCOIN_PATH}:/data/.bitcoin
+            
+  #   restart: always
+
+  # alice:
+  #   container_name: alice-ln
+  #   build:
+  #       context: lnd
+  #   networks:
+  #     - lnnet
+  #   expose:
+  #     - "9735"
+  #   restart: always
+
+  # bob:
+  #   container_name: bob-ln
+  #   build:
+  #       context: lnd
+  #   networks:
+  #     - lnnet
+  #   expose:
+  #     - "9735"
+  #   restart: always
+
+  jupyter:
     build:
-        context: bitcoind
+      context: ./jupyter
+    image: jupyter
+    container_name: jupyter
+    hostname: jupyter
+    ports:
+      - "8888:8888"
     networks:
       - lnnet
-    expose:
-      - "19011" 
-      - "19001"
-      - "18333" # Bitcoin network protocol
-      - "18332" # RPC
     volumes:
-      - ${HD_PATH}:/data/.bitcoin
-            
-    restart: always
+      - ./notebook:/notebook
+      - ./volumes:/lnd_share
+    command: >
+      /bin/sh -c "jupyter notebook \
+        --ip='*' \
+        --no-browser \
+        --NotebookApp.notebook_dir='/notebook' \
+        --NotebookApp.token='' \
+        --NotebookApp.password=''"
 
-  # Alice:
-  #   container_name: Alice
-  #   build:
-  #       context: lnd
-  #   image: lnbook/lnd:latest
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
-
-  # Bob:
-  #   container_name: Bob
-  #   build:
-  #     context: c-lightning
-  #   image: lnbook/c-lightning:latest
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
-
-  # Chan:
-  #   container_name: Chan
-  #   build:
-  #       context: eclair
-  #   image: lnbook/eclair:latest
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
-
-  # Dina:
-  #   container_name: Dina
-  #   build:
-  #       context: lnd
-  #   image: lnbook/lnd:latest
-  #   networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
+networks:
+  lnnet:
+    external: true

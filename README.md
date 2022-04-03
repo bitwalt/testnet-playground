@@ -5,6 +5,12 @@ Bitcoin-LN Testnet Playground with high-level code and python api.
 The aim of this project is to speed-up a development playground over bitcoin and LN.
 
 
+TODO: 
+
+Environment con bitcoind, bitcoin-cli e lnd-cli + python bindings
+
+
+
 Repository based on: 
 
 - https://github.com/freewil/bitcoin-testnet-box

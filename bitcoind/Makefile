@@ -5,6 +5,7 @@ B1_FLAGS=
 B2_FLAGS=
 B1=-datadir=1 $(B1_FLAGS)
 B2=-datadir=2 $(B2_FLAGS)
+R=-datadir=regtest
 T=-datadir=/testnet
 BLOCKS=1
 ADDRESS=
@@ -61,7 +62,7 @@ docker-build:
 	docker build -t bitcoin-test .
 
 docker-run:
-	docker run -it -d -p 19001:19001 -p 19011:19011 -v $(PWD):/home/tester/bitcoin-testnet-box -v $(HD_PATH):/testnet bitcoin-test 
+	docker run -it --net=host -v $(PWD):/home/tester/bitcoin-testnet-box bitcoin-test 
 
 
 docker-testnet:

@@ -20,3 +20,8 @@ alias la='ls -Al'
 
 alias b1='bitcoin-cli -datadir=1 '
 alias b2='bitcoin-cli -datadir=2 '
+
+
+export REGTEST_DIR="regtest"
+alias bitsteind="bitcoind -regtest -datadir=$REGTEST_DIR"
+alias bitstein-cli="bitcoin-cli -regtest -datadir=$REGTEST_DIR"

@@ -6,6 +6,14 @@
 !?/regtest/server.pem
 !?/regtest/server.cert
 
+.vscode/
+.ipynb_checkpoints/
+volumes/
+.DS_Store
+*.tmp
+*.log
+
+
 *.dat
 # Byte-compiled / optimized / DLL files
 __pycache__/
