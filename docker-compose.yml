@@ -45,21 +45,21 @@ services:
     restart: always
   
 
-  # jupyter:
-  #   build: 
-  #     context: jupyter
-  #   container_name: jupyter
-  #   hostname: jupyter
-  #   networks:
-  #     - lnnet    
-  #   ports:
-  #     - "8888:8888"
-  #   volumes:
-  #     - ./notebook:/home/jovyan/work
-  #     - ./volumes:/lnd_share
-  #   command: "start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
-  #   logging:
-  #     driver: none
+  jupyter:
+    build: 
+      context: jupyter
+    container_name: jupyter
+    hostname: jupyter
+    networks:
+      - lnnet    
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebook:/home/jovyan/work
+      - ./volumes:/lnd_share
+    command: "start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
+    logging:
+      driver: none
     
 networks:
   lnnet:

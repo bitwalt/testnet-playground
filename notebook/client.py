@@ -17,7 +17,7 @@ class RpcClient:
 
 class BtcClient:
     def __init__(self):
-        self.rpc = RpcClient('http://user:password@192.168.50.4:18443')
+        self.rpc = RpcClient('http://regtest:regtest@127.0.0.1:18443')
     def __getattr__(self, method):
         def missing_method(*args, **kwargs):
             return self.rpc.call(method, *args)
