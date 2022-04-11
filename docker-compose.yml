@@ -2,48 +2,35 @@ version: "3.7"
 
 services:
   
-  bitcoind:
-    container_name: bitcoind
+  bitcoin-core:
+    container_name: bitcoin-core
     build:
         context: bitcoind
+        args:
+          LND_VER: $LND_VER
+          ARCH: $ARCH
+          BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION 
     networks:
       - lnnet
+    volumes:
+      - $(PWD):/home/bitcoin/testnet
     expose:
-      - "18443"
-      - "12005"
-      - "12006"
+      - "18333"
+      - "18332"
+      - "28332"
+      - "28333"
     restart: always
       
-  alice:
-    container_name: alice-ln
-    build:
-        context: lnd
-    networks:
-      - lnnet
-    expose:
-      - "9735"
-    restart: always
+  # ln-node:
+  #   container_name: ln-node
+  #   build:
+  #       context: lnd
+  #   networks:
+  #     - lnnet
+  #   expose:
+  #     - "9735"
+  #   restart: always
 
-  bob:
-    container_name: bob-ln
-    build:
-        context: lnd
-    networks:
-      - lnnet
-    expose:
-      - "9735"
-    restart: always
-
-  chan:
-    container_name: chan-ln
-    build:
-        context: lnd
-    networks:
-      - lnnet
-    expose:
-      - "9735"
-    restart: always
-  
 
   jupyter:
     build: 

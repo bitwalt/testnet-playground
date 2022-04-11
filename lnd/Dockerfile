@@ -62,7 +62,9 @@ EXPOSE 10009/tcp
 EXPOSE 9735/tcp
 
 WORKDIR /lnd
-ENTRYPOINT ["/usr/local/bin/lnd-entrypoint.sh"]
+# ENTRYPOINT ["/usr/local/bin/lnd-entrypoint.sh"]
 
-# Show logs from beginning and keep following
-CMD ["/usr/local/bin/logtail.sh"]
+# # Show logs from beginning and keep following
+# CMD ["/usr/local/bin/logtail.sh"]
+
+CMD ["/bin/bash"]
