@@ -26,19 +26,12 @@ BITCOIND_VER=0.21.0
 GO_VER=1.13
 LND_VER=v0.13.1-beta
 
-# c-lightning version
-CL_VER=0.10.1
-
-# Eclair version
-ECLAIR_VER=0.4.2
-ECLAIR_COMMIT=52444b0
-
 # Docker registry for lnbook
 REGISTRY=docker.com
 ORG=lnbook
 
 # List of containers
-CONTAINERS=bitcoind lnd eclair c-lightning
+CONTAINERS=bitcoind lnd 
 
 .DEFAULT: pull
 

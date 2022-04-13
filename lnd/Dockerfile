@@ -43,17 +43,17 @@ ENV PATH $PATH:$GOPATH/bin
 
 COPY lnd /lnd
 RUN ln -s /lnd /root/.lnd
-COPY fund-lnd.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/fund-lnd.sh
+# COPY fund-lnd.sh /usr/local/bin
+# RUN chmod +x /usr/local/bin/fund-lnd.sh
 COPY bashrc /root/.bashrc
-COPY lnd-entrypoint.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/lnd-entrypoint.sh
-COPY logtail.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/logtail.sh
-COPY wait-for-bitcoind.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/wait-for-bitcoind.sh
-COPY cli /usr/local/bin
-RUN chmod +x /usr/local/bin/cli
+# COPY lnd-entrypoint.sh /usr/local/bin
+# RUN chmod +x /usr/local/bin/lnd-entrypoint.sh
+# COPY logtail.sh /usr/local/bin
+# RUN chmod +x /usr/local/bin/logtail.sh
+# COPY wait-for-bitcoind.sh /usr/local/bin
+# RUN chmod +x /usr/local/bin/wait-for-bitcoind.sh
+# COPY cli /usr/local/bin
+# RUN chmod +x /usr/local/bin/cli
 
 # LND RPC
 EXPOSE 10009/tcp

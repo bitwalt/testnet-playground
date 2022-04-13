@@ -13,14 +13,16 @@ services:
     networks:
       - lnnet
     volumes:
-      - $(PWD):/home/bitcoin/testnet
+      - $PWD/bitcoind:/home/bitcoin/testnet
     expose:
       - "18333"
       - "18332"
       - "28332"
       - "28333"
-    restart: always
-      
+    command: 
+      - bitcoind
+    restart: always 
+    
   # ln-node:
   #   container_name: ln-node
   #   build:
@@ -32,21 +34,21 @@ services:
   #   restart: always
 
 
-  jupyter:
-    build: 
-      context: jupyter
-    container_name: jupyter
-    hostname: jupyter
-    networks:
-      - lnnet    
-    ports:
-      - "8888:8888"
-    volumes:
-      - ./notebook:/home/jovyan/work
-      - ./volumes:/lnd_share
-    command: "start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
-    logging:
-      driver: none
+  # jupyter:
+  #   build: 
+  #     context: jupyter
+  #   container_name: jupyter
+  #   hostname: jupyter
+  #   networks:
+  #     - lnnet    
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - ./notebook:/home/jovyan/work
+  #     - ./volumes:/lnd_share
+  #   command: "start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
+  #   logging:
+  #     driver: none
     
 networks:
   lnnet:
