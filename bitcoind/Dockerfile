@@ -26,15 +26,19 @@ ADD $GH_URL/contrib/bitcoin-cli.bash-completion $BC/bitcoin-cli
 ADD $GH_URL/contrib/bitcoind.bash-completion $BC/bitcoind
 ADD $GH_URL/contrib/bitcoin-tx.bash-completion $BC/bitcoin-tx
 
-
-
 ENV PATH $PATH:/usr/local/bin/bitcoin/bin
 EXPOSE 18333 18332 28332 28333
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh	
-ENTRYPOINT [ "/entrypoint.sh" ]	
+# COPY create_bitcoin_conf.sh /create_bitcoin_conf.sh
+# RUN chmod +x /create_bitcoin_conf.sh
+# RUN bash create_bitcoin_conf.sh
+# ENTRYPOINT [ "/create_bitcoin_conf.sh" ]	
+
+# COPY entrypoint.sh /entrypoint.sh
+# RUN chmod +x /entrypoint.sh	
+# ENTRYPOINT [ "/entrypoint.sh" ]	
 
 USER bitcoin
 WORKDIR /home/bitcoin
 
-CMD ["tail", "-f", "/dev/null"]
+# CMD ["tail", "-f", "/dev/null"]
+# CMD ["/usr/bin/bash/"]

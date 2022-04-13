@@ -2,9 +2,6 @@ BITCOIND=bitcoind
 BITCOINGUI=bitcoin-qt
 BITCOINCLI=bitcoin-cli
 T=-datadir=/home/bitcoin/testnet
-
-# Modify here 
-HD_PATH=/mnt/electrum/testnet
 BITCOIN_CORE_VERSION=22.0
 ARCH=aarch64
 
@@ -36,7 +33,12 @@ docker-build:
 	--build-arg ARCH=$(ARCH) .
 
 docker-run:
-	docker run -it -d --rm --name btc_testnet -p 18333:18333 -p 18332:18332 -v $(HD_PATH):/home/bitcoin/testnet btc_testnet
+	sudo docker run -it -d --rm --name btc_testnet \
+	-p 18333:18333 	\
+	-p 18332:18332 \
+	--user "$(id -u):$(id -g)" \
+	-v $(PWD)/:/home/bitcoin \
+	btc_testnet
 
 docker-attach:
 	docker attach --detach-keys="ctrl-a" btc_testnet

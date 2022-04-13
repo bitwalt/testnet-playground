@@ -1,8 +1,7 @@
 .project
 
-?/blocks
-?/regtest/*
-?/testnet/*
+bitcoind/testnet/testnet3/
+
 !?/regtest/server.pem
 !?/regtest/server.cert
 
