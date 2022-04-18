@@ -40,5 +40,5 @@ EXPOSE 18333 18332 28332 28333
 USER bitcoin
 WORKDIR /home/bitcoin
 
-# CMD ["tail", "-f", "/dev/null"]
+CMD ["tail", "-f", "/dev/null"]
 # CMD ["/usr/bin/bash/"]

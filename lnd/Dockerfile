@@ -1,70 +1,51 @@
-ARG OS=ubuntu
-ARG OS_VER=focal
+FROM --platform=linux/amd64 ubuntu:bionic 
+
+ENV DEBCONF_NOWARNINGS yes
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update  -y \
+&&  apt-get upgrade -y
+
+RUN apt-get install -y \
+    wget \
+    tar  \
+    git  \
+    build-essential \
+&&  apt-get clean \
+&&  rm -rf /var/lib/apt/lists/*
+
 ARG GO_VER=1.13
-# Define base images with ARG versions
-FROM ${OS}:${OS_VER} as os
-FROM golang:${GO_VER} as go
+ARG GO_TAR=go${GO_VER}.linux-amd64.tar.gz
+RUN wget -q https://dl.google.com/go/${GO_TAR} \
+&&  sha256sum ${GO_TAR} | awk -F " " '{ print $1 }' \
+&&  tar -C /usr/local -xzf ${GO_TAR} \
+&&  rm -f ${GO_TAR}
 
-# OS image with command-line utilities
-FROM os AS os-base
+ENV GOPATH $HOME/gocode
+ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
 
-# Install dependencies
-RUN DEBIAN_FRONTEND=noninteractive \
-    apt-get update -qq && apt-get install -yqq \
-		curl unzip jq bash-completion
+ARG LND_VER
+RUN go get -d github.com/lightningnetwork/lnd \
+&&  cd ${GOPATH}/src/github.com/lightningnetwork/lnd \
+&&  git checkout ${LND_VER} \
+&&  make \
+&&  make install
 
-# Go image for building LND
-FROM go as lnd-build
+RUN mkdir -p /home/lnd/.lnd
+COPY conf/lnd.conf /home/lnd/.lnd/.
 
-ENV GO_VER=${GO_VER}
-ENV GOPATH=/go
+RUN groupadd -r lnd \
+&&  useradd -r -g lnd lnd \
+&&  mkdir -p /home/lnd/.lnd \
+&&  chown -R lnd:lnd /home/lnd
 
-# Build LND
-ARG LND_VER=v0.13.1-beta
-ENV LND_VER=${LND_VER}
-RUN	mkdir -p ${GOPATH}/src && \
-	cd ${GOPATH}/src && \
-	go get -v -d github.com/lightningnetwork/lnd && \
-	cd ${GOPATH}/src/github.com/lightningnetwork/lnd && \
-	git checkout tags/${LND_VER} && \
-	make clean && make && make install
+RUN apt-get update  -y \
+&&  apt-get install -y expect xxd jq
 
-# Runtime image for running LND
-FROM os-base as lnd-run
+USER lnd
+WORKDIR /home/lnd
+COPY conf/lnd.conf /home/lnd/.lnd/.
+COPY script/*.sh /home/lnd/
+RUN mkdir -p /home/lnd/share
 
-# Copy only the executables
-COPY --from=lnd-build /go/bin /go/bin
-
-ADD https://raw.githubusercontent.com/lightningnetwork/lnd/master/contrib/lncli.bash-completion \
-	   /usr/share/bash-completion/completions/lncli
-
-ENV GOPATH /go
-ENV PATH $PATH:$GOPATH/bin
-
-COPY lnd /lnd
-RUN ln -s /lnd /root/.lnd
-# COPY fund-lnd.sh /usr/local/bin
-# RUN chmod +x /usr/local/bin/fund-lnd.sh
-COPY bashrc /root/.bashrc
-# COPY lnd-entrypoint.sh /usr/local/bin
-# RUN chmod +x /usr/local/bin/lnd-entrypoint.sh
-# COPY logtail.sh /usr/local/bin
-# RUN chmod +x /usr/local/bin/logtail.sh
-# COPY wait-for-bitcoind.sh /usr/local/bin
-# RUN chmod +x /usr/local/bin/wait-for-bitcoind.sh
-# COPY cli /usr/local/bin
-# RUN chmod +x /usr/local/bin/cli
-
-# LND RPC
-EXPOSE 10009/tcp
-
-# LND P2P
-EXPOSE 9735/tcp
-
-WORKDIR /lnd
-# ENTRYPOINT ["/usr/local/bin/lnd-entrypoint.sh"]
-
-# # Show logs from beginning and keep following
-# CMD ["/usr/local/bin/logtail.sh"]
-
-CMD ["/bin/bash"]
+CMD ["tail", "-f", "/dev/null"]

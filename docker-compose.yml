@@ -2,14 +2,16 @@ version: "3.7"
 
 services:
   
-  bitcoin-core:
-    container_name: bitcoin-core
+  bitcoin-test:
+    container_name: bitcoin-test
+    user: 1000:1000
     build:
         context: bitcoind
         args:
-          LND_VER: $LND_VER
           ARCH: $ARCH
+          # ARCH: aarch64
           BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION 
+          # BITCOIN_CORE_VERSION: 22.0 
     networks:
       - lnnet
     volumes:
@@ -23,6 +25,23 @@ services:
       - bitcoind
     restart: always 
     
+  lnd-test:
+      container_name: lnd-test
+      image: lightninglabs/lnd:v0.14.2-beta@sha256:8318a24a3ad7319e424253eb56efcbf38e820ebc6d6b6edeec6a8a4e3e9314a0
+      user: 1000:1000
+      volumes:
+        - ${PWD}/lnd:/data/.lnd
+      environment:
+        HOME: /data
+      restart: on-failure
+      stop_grace_period: 5m30s
+      ports:
+        - "9735:9735"
+        - "$LND_REST_PORT:$LND_REST_PORT"
+        - "$LND_GRPC_PORT:$LND_GRPC_PORT"
+      networks:
+        - lnnet
+            
   # ln-node:
   #   container_name: ln-node
   #   build:
@@ -52,4 +71,3 @@ services:
     
 networks:
   lnnet:
-    external: true

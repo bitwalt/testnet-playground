@@ -33,7 +33,7 @@ docker-build:
 	--build-arg ARCH=$(ARCH) .
 
 docker-run:
-	sudo docker run -it -d --rm --name btc_testnet \
+	docker run -it -d --rm --name btc_testnet \
 	-p 18333:18333 	\
 	-p 18332:18332 \
 	--user "$(id -u):$(id -g)" \

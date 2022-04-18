@@ -2,8 +2,12 @@
 
 bitcoind/testnet/testnet3/
 
-!?/regtest/server.pem
-!?/regtest/server.cert
+*.dat
+*.log
+*.lock
+*.cookie
+*.pid
+
 
 .vscode/
 .ipynb_checkpoints/
