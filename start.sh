@@ -6,12 +6,12 @@ NETWORK=lnnet
 DRIVER=bridge
 
 # network
-if [ "$(docker network ls | awk '{print $2}' | grep $NETWORK)" == "" ]; then
-  NETWORK_ID=$(docker network create --driver=$DRIVER $NETWORK)
-  echo "docker network was created."
-  echo " name : $NETWORK"
-  echo " id   : $NETWORK_ID"
-fi
+# if [ "$(docker network ls | awk '{print $2}' | grep $NETWORK)" == "" ]; then
+#   NETWORK_ID=$(docker network create --driver=$DRIVER $NETWORK)
+#   echo "docker network was created."
+#   echo " name : $NETWORK"
+#   echo " id   : $NETWORK_ID"
+# fi
 
 
 # containers

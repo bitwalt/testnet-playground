@@ -19,5 +19,5 @@ alias lh='ls -lh'
 alias la='ls -Al'
 
 export TESTNET_DIR="/home/bitcoin/testnet"
-alias bd="bitcoind -testnet -datadir=$TESTNET_DIR"
-alias bt="bitcoin-cli -testnet -datadir=$TESTNET_DIR"
+alias btd="bitcoind -testnet -datadir=$TESTNET_DIR"
+alias btcli="bitcoin-cli -testnet -datadir=$TESTNET_DIR"

@@ -1,7 +1,9 @@
 FROM ubuntu
 
-RUN apt-get update && \
-	apt-get install --yes make wget
+# Install dependencies
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get update -qq && apt-get install -yqq \
+		curl unzip jq bash-completion make wget
 
 ARG BITCOIN_CORE_VERSION
 ARG ARCH
@@ -15,9 +17,10 @@ RUN wget "https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_CORE_VERSION}/bitco
 # add user and group for bitcoin
 RUN groupadd -r bitcoin &&  useradd -r -s /sbin/nologin -g bitcoin bitcoin 
 # copy files into the image
-ADD . /home/bitcoin
+# COPY . /home/bitcoin
+# USER bitcoin
+# RUN chown -R bitcoin:bitcoin /home/bitcoin
 
-RUN chown -R bitcoin:bitcoin /home/bitcoin
 
 # bash completion for bitcoind and bitcoin-cli
 ENV GH_URL https://raw.githubusercontent.com/bitcoin/bitcoin/master/
@@ -28,17 +31,22 @@ ADD $GH_URL/contrib/bitcoin-tx.bash-completion $BC/bitcoin-tx
 
 ENV PATH $PATH:/usr/local/bin/bitcoin/bin
 EXPOSE 18333 18332 28332 28333
+
 # COPY create_bitcoin_conf.sh /create_bitcoin_conf.sh
 # RUN chmod +x /create_bitcoin_conf.sh
 # RUN bash create_bitcoin_conf.sh
-# ENTRYPOINT [ "/create_bitcoin_conf.sh" ]	
 
-# COPY entrypoint.sh /entrypoint.sh
-# RUN chmod +x /entrypoint.sh	
-# ENTRYPOINT [ "/entrypoint.sh" ]	
+# Copy bitcoind configuration directory
+COPY testnet/bitcoin.conf /home/bitcoin/testnet/bitcoin.conf
 
-USER bitcoin
+# Copy support scripts
+COPY .bashrc /root/.bashrc
+RUN . 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh	
+
 WORKDIR /home/bitcoin
 
+ENTRYPOINT [ "/entrypoint.sh" ]	
+
 CMD ["tail", "-f", "/dev/null"]
-# CMD ["/usr/bin/bash/"]
