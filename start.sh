@@ -2,8 +2,8 @@
 
 set -eu -o pipefail
 
-NETWORK=lnnet
-DRIVER=bridge
+# NETWORK=lnnet
+# DRIVER=bridge
 
 # network
 # if [ "$(docker network ls | awk '{print $2}' | grep $NETWORK)" == "" ]; then
@@ -15,7 +15,7 @@ DRIVER=bridge
 
 
 # containers
-docker-compose down
+docker-compose down;
 docker-compose build;
 docker-compose up -d  --force-recreate --remove-orphans;
 

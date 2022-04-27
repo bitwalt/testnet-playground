@@ -2,12 +2,17 @@
 
 bitcoind/testnet/testnet3/
 
+# Bitcoin files
 *.dat
 *.log
 *.lock
 *.cookie
 *.pid
-
+# LND files
+*.cert 
+*.key
+*.db
+*.backup
 
 .vscode/
 .ipynb_checkpoints/
@@ -16,8 +21,7 @@ volumes/
 *.tmp
 *.log
 
-
-*.dat
+.bash_history
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

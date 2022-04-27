@@ -1,47 +1,47 @@
-ARG OS=ubuntu
-ARG OS_VER=focal
-ARG GO_VER=1.13
-# Define base images with ARG versions
-FROM ${OS}:${OS_VER} as os
-FROM golang:${GO_VER} as go
+FROM golang:1.18-alpine as builder
 
-# OS image with command-line utilities
-FROM os AS os-base
+# Force Go to use the cgo based DNS resolver. This is required to ensure DNS
+# queries required to connect to linked containers succeed.
+ENV GODEBUG netdns=cgo
 
+# Pass a tag, branch or a commit using build-arg.  This allows a docker
+# image to be built from a specified Git state.  The default image
+# will use the Git tip of master by default.
+ARG checkout="master"
+ARG git_url="https://github.com/lightningnetwork/lnd"
+
+# Install dependencies and build the binaries.
+RUN apk add --no-cache --update alpine-sdk \
+    git \
+    make \
+    gcc \
+&&  git clone $git_url /go/src/github.com/lightningnetwork/lnd \
+&&  cd /go/src/github.com/lightningnetwork/lnd \
+&&  git checkout $checkout \
+&&  make release-install
+
+# Start a new, final image.
+FROM ubuntu as final
+
+
+# Add utilities for quality of life and SSL-related reasons. We also require
+# curl and gpg for the signature verification script.
 # Install dependencies
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update -qq && apt-get install -yqq \
-		curl unzip jq bash-completion
+		curl unzip jq bash-completion \
+    	ca-certificates gnupg 
+    
+# Copy the binaries from the builder image.
+COPY --from=builder /go/bin/lncli /bin/
+COPY --from=builder /go/bin/lnd /bin/
+COPY --from=builder /go/src/github.com/lightningnetwork/lnd/scripts/verify-install.sh /
+COPY --from=builder /go/src/github.com/lightningnetwork/lnd/scripts/keys/* /keys/
 
-# Go image for building LND
-FROM go as lnd-build
-
-ENV GO_VER=${GO_VER}
-ENV GOPATH=/go
-
-# Build LND
-ARG LND_VER=v0.13.1-beta
-ENV LND_VER=${LND_VER}
-RUN	mkdir -p ${GOPATH}/src && \
-	cd ${GOPATH}/src && \
-	go get -v -d github.com/lightningnetwork/lnd && \
-	cd ${GOPATH}/src/github.com/lightningnetwork/lnd && \
-	git checkout tags/${LND_VER} && \
-	make clean && make && make install
-
-# Runtime image for running LND
-FROM os-base as lnd-run
-
-# Copy only the executables
-COPY --from=lnd-build /go/bin /go/bin
-
-ADD https://raw.githubusercontent.com/lightningnetwork/lnd/master/contrib/lncli.bash-completion \
-	   /usr/share/bash-completion/completions/lncli
-
-
-RUN apt-get update  -y \
-&&  apt-get install -y expect xxd jq
-
+# Store the SHA256 hash of the binaries that were just produced for later
+# verification.
+RUN sha256sum /bin/lnd /bin/lncli > /shasums.txt \
+  && cat /shasums.txt
 
 #- - - - - - -
 # Copy scripts and configuration files
@@ -50,8 +50,8 @@ RUN mkdir -p /home/lnd/.lnd
 RUN mkdir -p /home/lnd/share
 
 COPY lnd/lnd.conf /home/lnd/.lnd/.
-COPY bashrc /root/.bashrc
-RUN . /root/.bashrc
+COPY bashrc /home/lnd/.bashrc
+RUN . /home/lnd/.bashrc
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh	
 

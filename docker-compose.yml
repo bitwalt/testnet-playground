@@ -3,41 +3,37 @@ version: "3.7"
 
 services:
                   
-  bitcoin-test:
-    container_name: bitcoin-test
-    build:
-        context: bitcoind
-        args:
-          ARCH: $ARCH
-          BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION     
-    volumes:
-      - $PWD/bitcoind:/home/bitcoin
-    restart: on-failure
+  # bitcoin-test:
+  #   container_name: bitcoin-test
+  #   build:
+  #       context: bitcoind
+  #       args:
+  #         ARCH: $ARCH
+  #         BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION     
+  #   volumes:
+  #     - $PWD/bitcoind:/home/bitcoin
+  #   restart: on-failure
     
-    ports:
-      - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
-      - "$BITCOIN_RPC_PORT:$BITCOIN_RPC_PORT"
-      - "$BITCOIN_ZMQ_RAWBLOCK_PORT:$BITCOIN_ZMQ_RAWBLOCK_PORT"
-      - "$BITCOIN_ZMQ_RAWTX_PORT:$BITCOIN_ZMQ_RAWTX_PORT"
-    networks:
-      default:
-        ipv4_address: $BITCOIN_IP
+  #   ports:
+  #     - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
+  #     - "$BITCOIN_RPC_PORT:$BITCOIN_RPC_PORT"
+  #     - "$BITCOIN_ZMQ_RAWBLOCK_PORT:$BITCOIN_ZMQ_RAWBLOCK_PORT"
+  #     - "$BITCOIN_ZMQ_RAWTX_PORT:$BITCOIN_ZMQ_RAWTX_PORT"
+  #   networks:
+  #     default:
+  #       ipv4_address: $BITCOIN_IP
 
     
   lnd-test:
       container_name: lnd-test
-      # image: lightninglabs/lnd:v0.14.2-beta@sha256:8318a24a3ad7319e424253eb56efcbf38e820ebc6d6b6edeec6a8a4e3e9314a0
       build:
         context: lnd
       volumes:
-        - ${PWD}/lnd:/data/.lnd
-      environment:
-        HOME: /data
+        - $PWD/lnd:/home/lnd/
       restart: on-failure
       stop_grace_period: 5m30s
       ports:
-        - "9735:9735"
-        - "$LND_REST_PORT:$LND_REST_PORT"
+        - "$LND_P2P_PORT:$LND_P2P_PORT"
         - "$LND_GRPC_PORT:$LND_GRPC_PORT"
       networks:
         default:
@@ -47,7 +43,7 @@ networks:
     default:
       name: lnnet
       ipam:
-          driver: bridge
+          driver: default
           config:
               - subnet: "$NETWORK_IP/24"
 
