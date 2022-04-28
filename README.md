@@ -1,21 +1,9 @@
 # StackUP Bitcoin LN-Playground 
 
-Bitcoin-LN Testnet Playground with high-level code and python api.
+Bitcoin-LN **Testnet** Playground with high-level code and python api.
 
 The aim of this project is to speed-up a development playground over bitcoin and LN.
 
-
-TODO: 
-
-Environment con bitcoind, bitcoin-cli e lnd-cli + python bindings
-
-
-
-Repository based on: 
-
-- https://github.com/freewil/bitcoin-testnet-box
-- https://github.com/lnbook/lnbook/tree/develop/code/docker
-  
 
 ## Docker 
 Install docker and docker-compose, skip if already installed 
@@ -37,17 +25,22 @@ Define your specs in .env:
 If you want you can modify bitcoin.conf for more settings. Take a look to: [bitcoin-core-config-generator](https://jlopp.github.io/bitcoin-core-config-generator/)
 
 ## Running all
-~~Run all with docker-compose.~~
+Run all with 
 
-~~Build:~~
 ```
-    docker-compose build  
+    bash start.sh  
 ```
-~~Run:~~
+Connect to bitcoin docker running
 ```
-    docker-compose up 
+    make run-bitcoin
 ```
-## Running Bitcoin Core
+
+Connect to bitcoin docker running
+```
+    make run-bitcoin
+```
+
+### Running Bitcoin Core only
 Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples. 
 ```
     cd bitcoind
@@ -55,8 +48,17 @@ Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples.
     make docker-run
 ```
 
-
 ## Python Examples
 [lnd-rest-api-example.ipynb](https://github.com/kadokko/example-lnd-rest-api/blob/master/notebook/lnd-rest-api-example.ipynb)
 
 - Multi-hop Payment (Alice -> (Bob) -> Charlie)
+
+### Repository inspired and/or based on: 
+- https://github.com/getumbrel/umbrel
+- https://github.com/kadokko/example-lnd-rest-api
+- https://github.com/freewil/bitcoin-testnet-box
+- https://github.com/lnbook/lnbook/tree/develop/code/docker
+  
+## TODO: 
+- Create new bitcoin.conf and lnd.conf on start 
+- REGTEST

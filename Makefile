@@ -35,13 +35,12 @@ CONTAINERS=bitcoind lnd
 
 .DEFAULT: pull
 
-
 # Run testnet
-bitcoin-test: 
+run-bitcoin: 
 	docker exec -it bitcoin-test /bin/bash 
 
 # Run testnet
-lnd-test: 
+run-lnd: 
 	docker exec -it lnd-test /bin/bash 
 
 

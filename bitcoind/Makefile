@@ -20,7 +20,7 @@ getinfo:
 sendfrom:
 	$(BITCOINCLI) $(T) sendtoaddress $(ADDRESS) $(AMOUNT)
 
-address:
+genaddress:
 	$(BITCOINCLI) $(T) getnewaddress $(ACCOUNT)
 
 stop:

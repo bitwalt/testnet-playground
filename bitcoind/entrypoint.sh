@@ -4,7 +4,7 @@ set -Eeuo pipefail
 DATADIR=/home/bitcoin/testnet
 # Start bitcoind
 echo "Starting bitcoind..."
-bitcoind -testnet -datadir=$DATADIR -daemon 
+#bitcoind -testnet -datadir=$DATADIR -daemon 
 
 
 # Wait for bitcoind startup
@@ -14,7 +14,7 @@ echo -n "Waiting for bitcoind to start"
 # 	echo -n "."
 # 	sleep 1
 # done
-echo
+# echo
 echo "Bitcoind started!"
 
 # Executing CMD

@@ -18,6 +18,4 @@ alias ll='ls -l'
 alias lh='ls -lh'
 alias la='ls -Al'
 
-export TESTNET_DIR="/home/lnd/testnet"
-
-alias lncli="lncli --lnddir=/lnd -n testnet"
+alias lncli="lncli --lnddir=.lnd -n testnet"

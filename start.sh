@@ -15,7 +15,7 @@ set -eu -o pipefail
 
 
 # containers
-docker-compose down;
+docker-compose down -t 3 ;
 docker-compose build;
 docker-compose up -d  --force-recreate --remove-orphans;
 

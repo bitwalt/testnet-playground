@@ -1,35 +1,34 @@
 version: "3.7"
 
-
 services:
                   
-  # bitcoin-test:
-  #   container_name: bitcoin-test
-  #   build:
-  #       context: bitcoind
-  #       args:
-  #         ARCH: $ARCH
-  #         BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION     
-  #   volumes:
-  #     - $PWD/bitcoind:/home/bitcoin
-  #   restart: on-failure
+  bitcoin-test:
+    container_name: bitcoin-test
+    build:
+        context: bitcoind
+        args:
+          ARCH: $ARCH
+          BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION     
+    volumes:
+      - ./bitcoind:/home/bitcoin
+    restart: on-failure
     
-  #   ports:
-  #     - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
-  #     - "$BITCOIN_RPC_PORT:$BITCOIN_RPC_PORT"
-  #     - "$BITCOIN_ZMQ_RAWBLOCK_PORT:$BITCOIN_ZMQ_RAWBLOCK_PORT"
-  #     - "$BITCOIN_ZMQ_RAWTX_PORT:$BITCOIN_ZMQ_RAWTX_PORT"
-  #   networks:
-  #     default:
-  #       ipv4_address: $BITCOIN_IP
+    ports:
+      - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
+      - "$BITCOIN_RPC_PORT:$BITCOIN_RPC_PORT"
+      - "$BITCOIN_ZMQ_RAWBLOCK_PORT:$BITCOIN_ZMQ_RAWBLOCK_PORT"
+      - "$BITCOIN_ZMQ_RAWTX_PORT:$BITCOIN_ZMQ_RAWTX_PORT"
+    networks:
+      default:
+        ipv4_address: $BITCOIN_IP
 
     
   lnd-test:
       container_name: lnd-test
       build:
         context: lnd
-      volumes:
-        - $PWD/lnd:/home/lnd/
+      # volumes:
+      #   - ./lnd:/home/lnd
       restart: on-failure
       stop_grace_period: 5m30s
       ports:
@@ -39,6 +38,21 @@ services:
         default:
             ipv4_address: $LND_IP
   
+  pyclient:
+    build: 
+      context: pyclient
+    container_name: pyclient
+    ports:
+      - "$JUPYTER_PORT:$JUPYTER_PORT"
+    volumes:
+      - ./pyclient:/home/pyclient
+    logging:
+      driver: none
+    networks:
+      default:
+          ipv4_address: $PYC_IP
+  
+  
 networks:
     default:
       name: lnnet
@@ -47,17 +61,7 @@ networks:
           config:
               - subnet: "$NETWORK_IP/24"
 
-  # ln-node:
-  #   container_name: ln-node
-  # build:
-  #    context: lnd
-    
-  # networks:
-  #     - lnnet
-  #   expose:
-  #     - "9735"
-  #   restart: always
-
+  
 # tor_proxy:
 #   container_name: tor
 #   image: lncm/tor:0.4.5.7@sha256:a83e0d9fd1a35adf025f2f34237ec1810e2a59765988dce1dfb222ca8ef6583c
@@ -85,19 +89,5 @@ networks:
 #                   ipv4_address: $TOR_SERVER_IP
 
 
-  # jupyter:
-  #   build: 
-  #     context: jupyter
-  #   container_name: jupyter
-  #   hostname: jupyter
-  #   networks:
-  #     - lnnet    
-  #   ports:
-  #     - "8888:8888"
-  #   volumes:
-  #     - ./notebook:/home/jovyan/work
-  #     - ./volumes:/lnd_share
-  #   command: "start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''"
-  #   logging:
-  #     driver: none
+  
     

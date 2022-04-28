@@ -23,14 +23,11 @@ RUN apk add --no-cache --update alpine-sdk \
 # Start a new, final image.
 FROM ubuntu as final
 
-
-# Add utilities for quality of life and SSL-related reasons. We also require
-# curl and gpg for the signature verification script.
 # Install dependencies
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update -qq && apt-get install -yqq \
 		curl unzip jq bash-completion \
-    	ca-certificates gnupg 
+    	ca-certificates gnupg make
     
 # Copy the binaries from the builder image.
 COPY --from=builder /go/bin/lncli /bin/
@@ -44,16 +41,6 @@ RUN sha256sum /bin/lnd /bin/lncli > /shasums.txt \
   && cat /shasums.txt
 
 #- - - - - - -
-# Copy scripts and configuration files
-
-RUN mkdir -p /home/lnd/.lnd
-RUN mkdir -p /home/lnd/share
-
-COPY lnd/lnd.conf /home/lnd/.lnd/.
-COPY bashrc /home/lnd/.bashrc
-RUN . /home/lnd/.bashrc
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh	
 
 # Create group and user for LND
 RUN groupadd -r lnd \
@@ -61,8 +48,17 @@ RUN groupadd -r lnd \
 &&  mkdir -p /home/lnd/.lnd \
 &&  chown -R lnd:lnd /home/lnd
 
+# Copy scripts and configuration files
+COPY lnd.conf /home/lnd/.lnd/
+COPY bashrc /home/lnd/.bashrc
+RUN . /home/lnd/.bashrc
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh	
+
+
 USER lnd
 WORKDIR /home/lnd
+
 
 # Expose lnd ports (p2p, rpc).
 EXPOSE 9735 10009
