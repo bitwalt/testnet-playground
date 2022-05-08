@@ -61,8 +61,8 @@ WORKDIR /home/lnd
 # Expose lnd ports (p2p, rpc).
 EXPOSE 9735 10009
 
-# ENTRYPOINT [ "/entrypoint.sh" ]	
-# CMD ["tail", "-f", "/dev/null"]
+ENTRYPOINT [ "/entrypoint.sh" ]	
+CMD ["tail", "-f", "/dev/null"]
 
 # CMD ["--debuglevel=debug", "--maxpendingchannels=10", "--rpclisten=0.0.0.0:10009", "--color=#4126a7", "--alias=MDMA", "--bitcoin.active", "--bitcoin.testnet", "--bitcoin.node=bitcoind", "--bitcoind.rpchost=btc", "--bitcoind.rpcuser=test", "--bitcoind.rpcpass=test", "--bitcoind.zmqpubrawblock=tcp://btc:28332", "--bitcoind.zmqpubrawtx=tcp://btc:28333", "--autopilot.active", "--autopilot.maxchannels=5", "--autopilot.allocation=0.6"]
-ENTRYPOINT ["lnd"]
+# ENTRYPOINT ["lnd"]

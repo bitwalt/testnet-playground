@@ -12,7 +12,6 @@ services:
     volumes:
       - ./bitcoind:/home/bitcoin
     restart: on-failure
-    
     ports:
       - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
       - "$BITCOIN_RPC_PORT:$BITCOIN_RPC_PORT"
@@ -27,8 +26,8 @@ services:
       container_name: lnd-test
       build:
         context: lnd
-      # volumes:
-      #   - ./lnd:/home/lnd
+      volumes:
+        - ./lnd:/home/lnd
       restart: on-failure
       stop_grace_period: 5m30s
       ports:

@@ -13,7 +13,7 @@ if [ "$(docker network ls | awk '{print $2}' | grep $DOCKER_NETWORK)" == "" ]; t
   NETWORK_ID=$(docker network create --gateway $GATEWAY_IP --subnet $NETWORK_IP/24 $DOCKER_NETWORK)
 #   NETWORK_ID=$(docker network create --driver=$DRIVER $NETWORK)
   echo "docker network was created."
-  echo " name : $NETWORK"
+  echo " name : $DOCKER_NETWORK"
   echo " id   : $NETWORK_ID"
 fi
 

@@ -6,16 +6,6 @@ set -euo pipefail
 # upon the user-supplied value of $NETWORK
 BITCOIN_NETWORK="${NETWORK:-regtest}"
 
-ENV="./env" 
-# Load existing credentials if we have some
-if [[ -f $ENV ]] ; then
-  echo "Configuration already exists, loading..."
-  return 
-fi
-
-# Load existing credentials if we have some
-[[ -f $ENV ]] && source $ENV
-
 if [ "$BITCOIN_NETWORK" != "testnet" ] && [ "$BITCOIN_NETWORK" != "regtest" ]; then
   echo "Error: Only testnet (default) or regtest"
   exit 1
@@ -28,25 +18,59 @@ echo "================================================"
 BITCOIN_CONF_FILE="./templates/bitcoin.conf"
 LND_CONF_FILE="./templates/lnd.conf"
 TOR_CONF_FILE="./templates/torrc"
-ENV_FILE="./.env"
-TMP_ENV_FILE="./templates/.env-sample"
+ENV_FILE="./templates/.env"
 
 # Remove intermediary files if they exist from any
 # previous unclean configuration run
 [[ -f "$BITCOIN_CONF_FILE" ]] && rm -f "$BITCOIN_CONF_FILE"
 [[ -f "$LND_CONF_FILE" ]] && rm -f "$LND_CONF_FILE"
 [[ -f "$TOR_CONF_FILE" ]] && rm -f "$TOR_CONF_FILE"
-[[ -f "$TMP_ENV_FILE" ]] && rm -f "$TMP_ENV_FILE"
+[[ -f "$ENV_FILE" ]] && rm -f "$ENV_FILE"
 
 # Copy template configs to intermediary configs
 [[ -f "./templates/bitcoin-sample.conf" ]] && cp "./templates/bitcoin-sample.conf" "$BITCOIN_CONF_FILE"
 [[ -f "./templates/lnd-sample.conf" ]] && cp "./templates/lnd-sample.conf" "$LND_CONF_FILE"
 [[ -f "./templates/torrc-sample" ]] && cp "./templates/torrc-sample" "$TOR_CONF_FILE"
-[[ -f "$TMP_ENV_FILE" ]] && cp "$ENV" "$TMP_ENV_FILE"
+[[ -f "./templates/.env-sample" ]] && cp "./templates/.env-sample" "$ENV_FILE"
 
 ##########################################################
 ############ Generate configuration variables ############
 ##########################################################
+
+# Load existing credentials if we have some
+[[ -f "./.env" ]] && source "./.env"
+[[ ! -z ${PREV_ENV_FILE+x} ]] && [[ -f "${PREV_ENV_FILE}" ]] && source "${PREV_ENV_FILE}"
+
+# GENERAL
+ARCH="aarch64"  # ARM64: aarch64, x86: x86_64
+DEVICE_HOSTNAME="testnetplay"
+NETWORK_IP="10.21.21.0"
+GATEWAY_IP="10.21.21.1"
+# BITCOIN 
+BITCOIN_CORE_VERSION="22.0"
+BITCOIN_RPC_USER="bitcoin"
+BITCOIN_IP="10.21.21.8"
+BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
+BITCOIN_ZMQ_RAWTX_PORT="28333"
+BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
+BITCOIN_ZMQ_SEQUENCE_PORT="28335"
+BITCOIN_RPC_PORT="18443"
+BITCOIN_P2P_PORT="18444"
+# LND
+LND_VERSION="v0.14.3-beta"
+LND_IP="10.21.21.9"
+RPC_HOST="bitcoind"
+LND_P2P_PORT="9735"
+LND_GRPC_PORT="10009"
+LND_REST_PORT="8080"
+# TOR
+TOR_PROXY_IP="10.21.21.11"
+TOR_SERVER_IP="10.21.21.49"
+TOR_PROXY_PORT="9050"
+#PYTHON 
+JUPYTER_PORT="8888"
+PYC_IP="10.21.21.10"
+
 
 # Generate RPC credentials
 if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${BITCOIN_RPC_AUTH+x} ]]; then
@@ -58,11 +82,6 @@ if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${B
   echo "RPC credentials created.."
   echo "bitcoin_rpc_user: ${BITCOIN_RPC_USER}"
   echo "bitcoin_rpc_password: ${BITCOIN_RPC_PASS}"
-  ## Add password to .env file  
-  echo "BITCOIN_RPC_PASS=${BITCOIN_RPC_PASS}" >> "$TMP_ENV_FILE"
-  echo "BITCOIN_RPC_AUTH=${BITCOIN_RPC_AUTH}" >> "$TMP_ENV_FILE"
-  echo "Password saved!"
-  echo
 fi
 
 # Pull Tor image and generate Tor password
@@ -71,8 +90,6 @@ if [[ -z ${TOR_PASSWORD+x} ]] || [[ -z ${TOR_HASHED_PASSWORD+x} ]]; then
   echo
   TOR_PASSWORD=$("./scripts/rpcauth.py" "itdoesntmatter" | tail -1)
   TOR_HASHED_PASSWORD=$(docker run --rm getumbrel/tor:v0.4.1.9 --quiet --hash-password "$TOR_PASSWORD")
-  echo "TOR_PASSWORD=${TOR_PASSWORD}" >> "$TMP_ENV_FILE"
-  echo "TOR_HASHED_PASSWORD=${TOR_HASHED_PASSWORD}" >> "$TMP_ENV_FILE"
 fi
 
 ##########################################################
@@ -109,26 +126,24 @@ if [ "$BITCOIN_NETWORK" == "regtest" ]; then
   sed -i '' "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
 fi
 
-# Add hostname to lnd.conf for TLS certificate
-DEVICE_HOSTNAME="$(hostname)"
-sed -i '' "s/tlsextradomain=<hostname>/tlsextradomain=$DEVICE_HOSTNAME.local/g;" "$LND_CONF_FILE"
 
-# If node is already synced, do not reset to neutrino
-# if [[ -f "${STATUS_DIR}/node-status-bitcoind-ready" ]]; then
-#   sed -i '' "s/bitcoin.node=.*/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
-# fi
-
-for template in "${BITCOIN_CONF_FILE}" "${LND_CONF_FILE}" "${TOR_CONF_FILE}" ; do
+for template in "${BITCOIN_CONF_FILE}" "${LND_CONF_FILE}" "${TOR_CONF_FILE}" "${ENV_FILE}"; do
   sed -i '' "s/<network-ip>/${NETWORK_IP}/g" "${template}"
   sed -i '' "s/<gateway-ip>/${GATEWAY_IP}/g" "${template}"
+  sed -i '' "s/<arch>/${ARCH}/g" "${template}"
+  sed -i '' "s/<device_hostname>/${DEVICE_HOSTNAME}/g" "${template}"
   # BITCOIN
+  sed -i '' "s/<bitcoin_core_version>/${BITCOIN_CORE_VERSION}/g" "${template}"
   sed -i '' "s/<bitcoin-ip>/${BITCOIN_IP}/g" "${template}"
   sed -i '' "s/<bitcoin-p2p-port>/${BITCOIN_P2P_PORT}/g" "${template}"
   sed -i '' "s/rpcport=<port>/rpcport=$BITCOIN_RPC_PORT/g;" "${template}"
   sed -i '' "s/port=<port>/port=$BITCOIN_P2P_PORT/g;" "${template}"
   sed -i '' "s/<bitcoin-rpc-port>/$BITCOIN_RPC_PORT/g;" "${template}"
   sed -i '' "s/<bitcoin-p2p-port>/$BITCOIN_P2P_PORT/g;" "${template}"
+  sed -i '' "s/BITCOIN_NETWORK=<network>/BITCOIN_NETWORK=$BITCOIN_NETWORK/g;" "${template}"
   sed -i '' "s/BITCOIN_RPC_USER=<username>/BITCOIN_RPC_USER=$BITCOIN_RPC_USER/g;" "${template}"
+  sed -i '' "s/BITCOIN_RPC_PORT=<bitcoin-rpc-port>/BITCOIN_RPC_PORT=$BITCOIN_RPC_PORT/g;" "${template}"
+  sed -i '' "s/BITCOIN_P2P_PORT=<bitcoin-p2p-port>/BITCOIN_P2P_PORT=$BITCOIN_P2P_PORT/g;" "${template}"
   sed -i '' "s/BITCOIN_RPC_PASS=<password>/BITCOIN_RPC_PASS=$BITCOIN_RPC_PASS/g;" "${template}"
   sed -i '' "s/BITCOIN_RPC_AUTH=<rpcauth>/BITCOIN_RPC_AUTH='$BITCOIN_RPC_AUTH'/g;" "${template}"
   sed -i '' "s/rpcauth=<rpcauth>/rpcauth=$BITCOIN_RPC_AUTH/g;" "${template}"
@@ -138,9 +153,13 @@ for template in "${BITCOIN_CONF_FILE}" "${LND_CONF_FILE}" "${TOR_CONF_FILE}" ; d
   sed -i '' "s/<zmq-rawtx-port>/${BITCOIN_ZMQ_RAWTX_PORT}/g;" "${template}"
   sed -i '' "s/<zmq-hashblock-port>/${BITCOIN_ZMQ_HASHBLOCK_PORT}/g;" "${template}"
   # LND
+  sed -i '' "s/<lnd_version>/${LND_VERSION}/g" "${template}"
   sed -i '' "s/<lnd-ip>/${LND_IP}/g" "${template}"
+  sed -i '' "s/<lnd-p2p-port>/${LND_P2P_PORT}/g" "${template}"
   sed -i '' "s/<lnd-grpc-port>/${LND_GRPC_PORT}/g" "${template}"
   sed -i '' "s/<lnd-rest-port>/${LND_REST_PORT}/g" "${template}"
+  sed -i '' "s/tlsextradomain=<hostname>/tlsextradomain=$DEVICE_HOSTNAME.local/g;" "${template}"
+
   # TOR
   sed -i '' "s/HashedControlPassword <password>/HashedControlPassword $TOR_HASHED_PASSWORD/g;" "${template}"
   sed -i '' "s/torpassword=<password>/torpassword=$TOR_PASSWORD/g;" "${template}"
@@ -156,6 +175,7 @@ done
 ##########################################################
 mv -f "$BITCOIN_CONF_FILE" "./bitcoind/bitcoin.conf"
 mv -f "$TOR_CONF_FILE" "./tor/torrc"
+mv -f "$ENV_FILE" "./.env"
 
 # Only write LND config if one doesn't already exist to preserve any user changes.
 if [[ -f "./lnd/lnd.conf" ]]; then
@@ -164,13 +184,5 @@ if [[ -f "./lnd/lnd.conf" ]]; then
 else
   mv -f "$LND_CONF_FILE" "./lnd/lnd.conf"
 fi
-
-
-if [[ -f $ENV_FILE ]]; then
-  echo "Skipping saving env file..."
-else
-  echo "Saving env file..."
-  cp -f "$TMP_ENV_FILE" "$ENV_FILE"
-
 
 echo "Configuration successful!"
