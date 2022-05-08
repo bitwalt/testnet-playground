@@ -2,6 +2,7 @@
 .DS_Store
 bitcoind/testnet/testnet3/
 bitcoind/regtest/
+lnd/.lnd
 # Bitcoin files
 *.dat
 *.log
