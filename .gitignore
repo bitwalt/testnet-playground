@@ -1,7 +1,7 @@
 .project
 .DS_Store
 bitcoind/testnet/testnet3/
-
+bitcoind/regtest/
 # Bitcoin files
 *.dat
 *.log
