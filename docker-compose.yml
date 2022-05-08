@@ -57,10 +57,9 @@ networks:
     default:
       name: lnnet
       ipam:
-          driver: default
           config:
               - subnet: "$NETWORK_IP/24"
-
+                gateway: "$GATEWAY_IP"
   
 # tor_proxy:
 #   container_name: tor

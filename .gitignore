@@ -1,5 +1,5 @@
 .project
-
+.DS_Store
 bitcoind/testnet/testnet3/
 
 # Bitcoin files

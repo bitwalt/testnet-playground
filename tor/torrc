@@ -1,0 +1,25 @@
+# Warning: it's not recommended to modify these files directly. Any
+# modifications you make can break the functionality of your umbrel. These files
+# are automatically reset with every Umbrel update.
+
+# Bind only to "10.21.21.11" which is the tor IP within the container
+SocksPort   10.21.21.11:9050
+ControlPort 10.21.21.11:29051
+
+# Bitcoin Core P2P Hidden Service
+HiddenServiceDir /var/lib/tor/bitcoin-p2p
+HiddenServicePort 18444 10.21.21.8:18444
+
+# Bitcoin Core RPC Hidden Service
+HiddenServiceDir /var/lib/tor/bitcoin-rpc
+HiddenServicePort 18443 10.21.21.8:18443
+
+# LND REST Hidden Service
+HiddenServiceDir /var/lib/tor/lnd-rest
+HiddenServicePort 8080 10.21.21.9:8080
+
+# LND gRPC Hidden Service
+HiddenServiceDir /var/lib/tor/lnd-grpc
+HiddenServicePort 10009 10.21.21.9:10009
+
+HashedControlPassword 16:B835DEC10DC240EF6083A9B73B96D6CFFE9D2F6988775A2E762A39C598

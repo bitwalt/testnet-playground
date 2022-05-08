@@ -37,8 +37,7 @@ EXPOSE 18333 18332 28332 28333
 # RUN bash create_bitcoin_conf.sh
 
 # Copy bitcoind configuration directory
-COPY testnet/bitcoin.conf /home/bitcoin/testnet/bitcoin.conf
-
+COPY bitcoin.conf /home/bitcoin/testnet/bitcoin.conf
 # Copy support scripts
 COPY .bashrc /root/.bashrc
 RUN . 
@@ -48,5 +47,6 @@ RUN chmod +x /entrypoint.sh
 WORKDIR /home/bitcoin
 
 ENTRYPOINT [ "/entrypoint.sh" ]	
-
 CMD ["tail", "-f", "/dev/null"]
+
+# CMD bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -printtoconsole

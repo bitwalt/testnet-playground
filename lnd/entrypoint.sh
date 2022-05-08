@@ -14,17 +14,10 @@ BITCOIN_IP=10.21.21.8
 BITCOIN_ZMQ_RAWBLOCK_PORT=28332
 BITCOIN_ZMQ_RAWTX_PORT=28333
 
-
-lnd --bitcoin.active --bitcoin.testnet --debuglevel=debug \
-       --bitcoin.node=bitcoind \
-       --bitcoind.rpcuser=$BITCOIN_RPC_USER \
-       --bitcoind.rpcpass=$BITCOIN_RPC_PASS \
-       --bitcoind.zmqpubrawblock=tcp://$BITCOIN_IP:$BITCOIN_ZMQ_RAWBLOCK_PORT \
-       --bitcoind.zmqpubrawtx=tcp://$BITCOIN_IP:$BITCOIN_ZMQ_RAWTX_PORT & \
-    #    --externalip=X.X.X.X
+lnd 
 
 echo "Startup complete"
 echo " "
 echo "Create or load a new wallet.."
 
-#exec "$@"
+exec "$@"

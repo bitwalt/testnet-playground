@@ -1,7 +1,7 @@
 BITCOIND=bitcoind
 BITCOINGUI=bitcoin-qt
 BITCOINCLI=bitcoin-cli
-T=-datadir=/home/bitcoin/testnet
+T=-datadir=/home/bitcoin/
 BITCOIN_CORE_VERSION=22.0
 ARCH=aarch64
 
