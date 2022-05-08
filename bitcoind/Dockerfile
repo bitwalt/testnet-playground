@@ -16,9 +16,6 @@ RUN wget "https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_CORE_VERSION}/bitco
 
 # add user and group for bitcoin
 RUN groupadd -r bitcoin &&  useradd -r -s /sbin/nologin -g bitcoin bitcoin 
-# copy files into the image
-# COPY . /home/bitcoin
-# USER bitcoin
 # RUN chown -R bitcoin:bitcoin /home/bitcoin
 
 
@@ -32,21 +29,18 @@ ADD $GH_URL/contrib/bitcoin-tx.bash-completion $BC/bitcoin-tx
 ENV PATH $PATH:/usr/local/bin/bitcoin/bin
 EXPOSE 18333 18332 28332 28333
 
-# COPY create_bitcoin_conf.sh /create_bitcoin_conf.sh
-# RUN chmod +x /create_bitcoin_conf.sh
-# RUN bash create_bitcoin_conf.sh
-
 # Copy bitcoind configuration directory
 COPY bitcoin.conf /home/bitcoin/testnet/bitcoin.conf
 # Copy support scripts
 COPY .bashrc /root/.bashrc
-RUN . 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh	
+COPY scripts/mine.sh /mine.sh
 
+RUN chmod +x /entrypoint.sh	
+RUN chmod +x /mine.sh	
+
+USER bitcoin
 WORKDIR /home/bitcoin
 
-ENTRYPOINT [ "/entrypoint.sh" ]	
+ENTRYPOINT [ "/entrypoint.sh",  "--network", "$BITCOIN_NETWORK" ]	
 CMD ["tail", "-f", "/dev/null"]
-
-# CMD bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -printtoconsole

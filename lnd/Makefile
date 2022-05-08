@@ -1,5 +1,13 @@
 	
 NETWORK=testnet 
+T=-datadir=/home/bitcoin/
+
+
+list-peers:
+ 	lncli --network=$(NETWORK) listpeers
+
+genaddress:
+	lncli --network=$(NETWORK) newaddress np2wkh 
 
 docker-build:
 	docker build \
@@ -16,9 +24,3 @@ docker-run:
 
 docker-attach:
 	docker attach --detach-keys="ctrl-a" lnd_testnet
-
-list-peers:
- 	lncli --network=$(NETWORK) listpeers
-
-genaddress:
-	lncli --network=$(NETWORK) newaddress np2wkh 

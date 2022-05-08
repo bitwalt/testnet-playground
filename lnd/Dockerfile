@@ -27,7 +27,7 @@ FROM ubuntu as final
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update -qq && apt-get install -yqq \
 		curl unzip jq bash-completion \
-    	ca-certificates gnupg make
+    	ca-certificates gnupg make expect xxd jq
     
 # Copy the binaries from the builder image.
 COPY --from=builder /go/bin/lncli /bin/
@@ -50,7 +50,7 @@ RUN groupadd -r lnd \
 
 # Copy scripts and configuration files
 COPY lnd.conf /home/lnd/.lnd/
-COPY bashrc /home/lnd/.bashrc
+COPY .bashrc /home/lnd/.bashrc
 RUN . /home/lnd/.bashrc
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh	
@@ -63,6 +63,3 @@ EXPOSE 9735 10009
 
 ENTRYPOINT [ "/entrypoint.sh" ]	
 CMD ["tail", "-f", "/dev/null"]
-
-# CMD ["--debuglevel=debug", "--maxpendingchannels=10", "--rpclisten=0.0.0.0:10009", "--color=#4126a7", "--alias=MDMA", "--bitcoin.active", "--bitcoin.testnet", "--bitcoin.node=bitcoind", "--bitcoind.rpchost=btc", "--bitcoind.rpcuser=test", "--bitcoind.rpcpass=test", "--bitcoind.zmqpubrawblock=tcp://btc:28332", "--bitcoind.zmqpubrawtx=tcp://btc:28333", "--autopilot.active", "--autopilot.maxchannels=5", "--autopilot.allocation=0.6"]
-# ENTRYPOINT ["lnd"]

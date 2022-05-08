@@ -21,5 +21,5 @@ fi
 docker-compose down -t 3 ; # wait 3 sec before kill
 docker-compose build;
 docker-compose up -d  --force-recreate --remove-orphans;
-
+docker-compose logs -f;
 

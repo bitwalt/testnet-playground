@@ -4,15 +4,19 @@ BITCOINCLI=bitcoin-cli
 T=-datadir=/home/bitcoin/
 BITCOIN_CORE_VERSION=22.0
 ARCH=aarch64
+ADDRESS=bcrt1q3636r9ax6gpsqctc0k6n5v8cprc05ntz8cr5uz
 
-start-testnet: 
+start: 
 	$(BITCOIND) $(T) -daemon
-	
-stop-testnet:
-	$(BITCOINCLI) $(T) stop
 
+stop:
+	$(BITCOINCLI) $(T) stop
+		
 createwallet:
 	$(BITCOINCLI) $(T) createwallet wallet1
+	
+loadwallet:
+	$(BITCOINCLI) $(T) loadwallet wallet1
 	
 getinfo:
 	$(BITCOINCLI) $(T) -getinfo
@@ -23,9 +27,9 @@ sendfrom:
 genaddress:
 	$(BITCOINCLI) $(T) getnewaddress $(ACCOUNT)
 
-stop:
-	$(BITCOINCLI) $(T) stop
-	
+mine:
+	$(BITCOINCLI) $(T) generatetoaddress 101 $(ADDRESS)
+
 docker-build:
 	docker build \
 	-t btc_testnet \

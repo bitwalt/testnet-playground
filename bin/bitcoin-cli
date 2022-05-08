@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+# REPO_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
 result=$(docker-compose \
-  --file "${REPO_ROOT}/docker-compose.yml" \
-  --env-file "${REPO_ROOT}/.env" \
+  --file "../docker-compose.yml" \
+  --env-file "../.env" \
   exec bitcoin-test bitcoin-cli "$@")
 
 # We need to echo with quotes to preserve output formatting
