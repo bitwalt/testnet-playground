@@ -124,6 +124,8 @@ if [ "$BITCOIN_NETWORK" == "regtest" ]; then
   sed -i '' "s/bitcoin.mainnet=1/bitcoin.regtest=1/g;" "$LND_CONF_FILE"
   # Use bitcoind as the node
   sed -i '' "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
+  # Disable tor
+  sed -i '' "s/tor.active=1/tor.active=0/g;" "$LND_CONF_FILE"
 fi
 
 

@@ -43,6 +43,8 @@ run-bitcoin:
 run-lnd: 
 	docker exec -it lnd-test /bin/bash 
 
+run-pyclient: 
+	docker exec -it pyclient /bin/bash 
 
 
 build-bitcoind:

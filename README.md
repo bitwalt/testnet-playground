@@ -30,14 +30,25 @@ Run all with
 ```
     bash start.sh  
 ```
-Connect to bitcoin docker running
+Connect to the bitcoin container where you can run **bitcoin-cli**
 ```
     make run-bitcoin
+```
+Connect to the lnd container where you can run **lncli**
+```
+    make run-lnd
 ```
 
-Connect to bitcoin docker running
+# Regtest 
 ```
-    make run-bitcoin
+#0. Run lnd node with regtest mode
+lnd
+#1. Create or load a wallet
+lncli create
+#2. Generate a new receiving address
+lncli newaddress p2wkh
+# 2. Send some bitcoin to the address
+bitcoin-cli --datadir=. sendtoaddress bcrt1qmxk3jpe37a6dmlyevm48emn9m0nxyuk24edsg2  10 
 ```
 
 ### Running Bitcoin Core only
@@ -49,16 +60,24 @@ Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples.
 ```
 
 ## Python Examples
-[lnd-rest-api-example.ipynb](https://github.com/kadokko/example-lnd-rest-api/blob/master/notebook/lnd-rest-api-example.ipynb)
-
 - Multi-hop Payment (Alice -> (Bob) -> Charlie)
+- Submarine Swap
 
 ### Repository inspired and/or based on: 
-- https://github.com/getumbrel/umbrel
-- https://github.com/kadokko/example-lnd-rest-api
-- https://github.com/freewil/bitcoin-testnet-box
-- https://github.com/lnbook/lnbook/tree/develop/code/docker
-  
+- [Umbrel](https://github.com/getumbrel/umbrel)
+- [example-lnd-rest-api](https://github.com/kadokko/example-lnd-rest-api)
+- [bitcoin-testnet-box](https://github.com/freewil/bitcoin-testnet-box)
+- [MasteringTheLightningNetwork docker](https://github.com/lnbook/lnbook/tree/develop/code/docker)
+
 ## TODO: 
-- Create new bitcoin.conf and lnd.conf on start 
-- REGTEST
+- [X] Create new bitcoin.conf and lnd.conf on start 
+- [X] REGTEST
+- [ ]  Create multiple lnd nodes for regtest
+- [ ]  Connect 3 nodes on regtest to create a lightning network 
+- [ ]  Config file for fast configuration start-up -> gen new docker-compose.yml
+- [ ]  Make a multi-hop payment in jupyter notebook
+- [ ]  Tor on testnet
+- [ ]  Connect testnet node with N new peers
+- [ ]  Send sats on your testnet mobile wallet over LN 
+- [ ]  Submarine swap on regtest using python 
+  

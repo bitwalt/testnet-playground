@@ -53,6 +53,7 @@ COPY lnd.conf /home/lnd/.lnd/
 COPY .bashrc /home/lnd/.bashrc
 RUN . /home/lnd/.bashrc
 COPY entrypoint.sh /entrypoint.sh
+COPY scripts/ /scripts/
 RUN chmod +x /entrypoint.sh	
 
 USER lnd
@@ -61,5 +62,5 @@ WORKDIR /home/lnd
 # Expose lnd ports (p2p, rpc).
 EXPOSE 9735 10009
 
-ENTRYPOINT [ "/entrypoint.sh" ]	
+# ENTRYPOINT [ "/entrypoint.sh", "--network", "$BITCOIN_NETWORK" ]	
 CMD ["tail", "-f", "/dev/null"]
