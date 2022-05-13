@@ -1,0 +1,83 @@
+version: "3.7"
+
+services:
+                  
+  bitcoin-test:
+    container_name: bitcoin-test
+    build:
+      context: bitcoind
+      args:
+        ARCH: $ARCH
+        BITCOIN_CORE_VERSION: $BITCOIN_CORE_VERSION     
+    volumes:
+      - ./bitcoind:/home/bitcoin
+    restart: on-failure
+    ports:
+      - "$BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT"
+      - "$BITCOIN_RPC_PORT:$BITCOIN_RPC_PORT"
+      - "$BITCOIN_ZMQ_RAWBLOCK_PORT:$BITCOIN_ZMQ_RAWBLOCK_PORT"
+      - "$BITCOIN_ZMQ_RAWTX_PORT:$BITCOIN_ZMQ_RAWTX_PORT"
+    networks:
+      default:
+        ipv4_address: $BITCOIN_IP
+    
+  lnd-test:
+    container_name: lnd-test
+    build:
+      context: lnd
+    # volumes:
+    #   - ./lnd:/home/lnd
+    restart: on-failure
+    stop_grace_period: 5m30s
+    ports:
+      - "$LND_P2P_PORT:$LND_P2P_PORT"
+      - "$LND_GRPC_PORT:$LND_GRPC_PORT"
+    networks:
+      default:
+          ipv4_address: $LND_IP
+  
+  tor_proxy:
+    container_name: tor
+    image: lncm/tor:0.4.5.7@sha256:a83e0d9fd1a35adf025f2f34237ec1810e2a59765988dce1dfb222ca8ef6583c
+    user: toruser
+    restart: on-failure
+    volumes:
+      - ${PWD}/tor/torrc-proxy:/etc/tor/torrc
+      - ${PWD}/tor/data:/var/lib/tor/
+    ports:
+      - "127.0.0.1:$TOR_PROXY_PORT:$TOR_PROXY_PORT"
+    networks:
+      default:
+        ipv4_address: $TOR_PROXY_IP
+
+  tor_server:
+    image: getumbrel/tor-server:0.4.6.8@sha256:a81797e4a6b0c4709dd6f7c5543ab99e318af329bdf728c5b267f412c51b9a31
+    restart: on-failure
+    volumes:
+      - ${PWD}/tor/torrc-server:/torrc
+      - ${PWD}/tor/data:/data
+    environment:
+      HS_PER_PROCESS: "10"
+    networks:
+      default:
+        ipv4_address: $TOR_SERVER_IP
+  
+  pyclient:
+    build: 
+      context: pyclient
+    container_name: pyclient
+    ports:
+      - "$JUPYTER_PORT:$JUPYTER_PORT"
+    # volumes:
+    #   - ./pyclient:/home/pyclient
+    networks:
+      default:
+          ipv4_address: $PYC_IP
+  
+networks:
+    default:
+      name: lnnet
+      ipam:
+          config:
+              - subnet: "$NETWORK_IP/24"
+                gateway: "$GATEWAY_IP"

@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# NETWORK=$1 
-# Configure for testnet or regtest depending
-# upon the user-supplied value of $NETWORK
-BITCOIN_NETWORK="${NETWORK:-regtest}"
+CONFIG_FILE="./config"
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
 
 if [ "$BITCOIN_NETWORK" != "testnet" ] && [ "$BITCOIN_NETWORK" != "regtest" ]; then
   echo "Error: Only testnet (default) or regtest"
@@ -19,9 +17,10 @@ BITCOIN_CONF_FILE="./templates/bitcoin.conf"
 LND_CONF_FILE="./templates/lnd.conf"
 TOR_CONF_FILE="./templates/torrc"
 ENV_FILE="./templates/.env"
+REG_DOCKER_COMPOSE="./templates/reg-docker-compose.yml" 
+TEST_DOCKER_COMPOSE="./templates/test-docker-compose.yml"
 
-# Remove intermediary files if they exist from any
-# previous unclean configuration run
+# Remove intermediary files if they exist from any previous unclean configuration run
 [[ -f "$BITCOIN_CONF_FILE" ]] && rm -f "$BITCOIN_CONF_FILE"
 [[ -f "$LND_CONF_FILE" ]] && rm -f "$LND_CONF_FILE"
 [[ -f "$TOR_CONF_FILE" ]] && rm -f "$TOR_CONF_FILE"
@@ -36,41 +35,6 @@ ENV_FILE="./templates/.env"
 ##########################################################
 ############ Generate configuration variables ############
 ##########################################################
-
-# Load existing credentials if we have some
-[[ -f "./.env" ]] && source "./.env"
-[[ ! -z ${PREV_ENV_FILE+x} ]] && [[ -f "${PREV_ENV_FILE}" ]] && source "${PREV_ENV_FILE}"
-
-# GENERAL
-ARCH="aarch64"  # ARM64: aarch64, x86: x86_64
-DEVICE_HOSTNAME="testnetplay"
-NETWORK_IP="10.21.21.0"
-GATEWAY_IP="10.21.21.1"
-# BITCOIN 
-BITCOIN_CORE_VERSION="22.0"
-BITCOIN_RPC_USER="bitcoin"
-BITCOIN_IP="10.21.21.8"
-BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
-BITCOIN_ZMQ_RAWTX_PORT="28333"
-BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
-BITCOIN_ZMQ_SEQUENCE_PORT="28335"
-BITCOIN_RPC_PORT="18443"
-BITCOIN_P2P_PORT="18444"
-# LND
-LND_VERSION="v0.14.3-beta"
-LND_IP="10.21.21.9"
-RPC_HOST="bitcoind"
-LND_P2P_PORT="9735"
-LND_GRPC_PORT="10009"
-LND_REST_PORT="8080"
-# TOR
-TOR_PROXY_IP="10.21.21.11"
-TOR_SERVER_IP="10.21.21.49"
-TOR_PROXY_PORT="9050"
-#PYTHON 
-JUPYTER_PORT="8888"
-PYC_IP="10.21.21.10"
-
 
 # Generate RPC credentials
 if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${BITCOIN_RPC_AUTH+x} ]]; then
@@ -110,7 +74,9 @@ if [ "$BITCOIN_NETWORK" == "testnet" ]; then
 #   sed -i '' "s/\# neutrino.addpeer=testnet1-btcd.zaphq.io/neutrino.addpeer=testnet1-btcd.zaphq.io/g;" "$LND_CONF_FILE"
 #   sed -i '' "s/\# neutrino.addpeer=testnet2-btcd.zaphq.io/neutrino.addpeer=testnet2-btcd.zaphq.io/g;" "$LND_CONF_FILE"
   sed -i '' "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
-    
+  
+  # copy docker-compose file for testnet
+  cp $TEST_DOCKER_COMPOSE "./docker-compose.yml"
 fi
 
 if [ "$BITCOIN_NETWORK" == "regtest" ]; then
@@ -126,6 +92,8 @@ if [ "$BITCOIN_NETWORK" == "regtest" ]; then
   sed -i '' "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
   # Disable tor
   sed -i '' "s/tor.active=1/tor.active=0/g;" "$LND_CONF_FILE"
+  # copy docker-compose file for regtest
+  cp $REG_DOCKER_COMPOSE "./docker-compose.yml"
 fi
 
 
@@ -157,7 +125,11 @@ for template in "${BITCOIN_CONF_FILE}" "${LND_CONF_FILE}" "${TOR_CONF_FILE}" "${
   # LND
   sed -i '' "s/<lnd_version>/${LND_VERSION}/g" "${template}"
   sed -i '' "s/<lnd-ip>/${LND_IP}/g" "${template}"
+  sed -i '' "s/<lnd-ip-bob>/${LND_IP_BOB}/g" "${template}"
+  sed -i '' "s/<lnd-ip-charlie>/${LND_IP_CHARLIE}/g" "${template}"
   sed -i '' "s/<lnd-p2p-port>/${LND_P2P_PORT}/g" "${template}"
+  sed -i '' "s/<lnd-p2p-port-b>/${LND_P2P_PORT_C}/g" "${template}"
+  sed -i '' "s/<lnd-p2p-port-c>/${LND_P2P_PORT_B}/g" "${template}"
   sed -i '' "s/<lnd-grpc-port>/${LND_GRPC_PORT}/g" "${template}"
   sed -i '' "s/<lnd-rest-port>/${LND_REST_PORT}/g" "${template}"
   sed -i '' "s/tlsextradomain=<hostname>/tlsextradomain=$DEVICE_HOSTNAME.local/g;" "${template}"

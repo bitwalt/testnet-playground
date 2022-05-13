@@ -1,35 +1,39 @@
-# StackUP Bitcoin LN-Playground 
+# Testnet Bitcoin-LN Playground 
 
-Bitcoin-LN **Testnet** Playground with high-level code and python api.
+The aim of this project is to speed-up a development environment over BP-LNP. 
+Python binding and libraries are providid in order to develop over the LN protocol on a Layer-3 perspective.
 
-The aim of this project is to speed-up a development playground over bitcoin and LN.
+Only **testnet** and **regtest** are supported.
 
+The playground is based on a series of docker containers, orchestrated by a docker-compose file.
+
+Tested on Raspberry Pi 4, Macbook Pro Intel Core, Macbook Air M1 
 
 ## Docker 
 Install docker and docker-compose, skip if already installed 
 ```
-chmod +x install_docker.sh
-./install_docker.sh
+chmod +x scripts/install_docker.sh
+sudo ./scripts/install_docker.sh
 ```
 
 ## Modify environment variables
-Define your specs in .env: 
+Define your specs in *config* file: 
 
  - Architecure: x86, ARM
+ - Bitcoin Network: regtest
  - BitcoinCore version: 22.0
- - LND version: 1.x
- - Network: testnet
- - Blockchain directory: /mnt/bitcoin/blockchain
- - RPC user:password
-
-If you want you can modify bitcoin.conf for more settings. Take a look to: [bitcoin-core-config-generator](https://jlopp.github.io/bitcoin-core-config-generator/)
+ - LND version: v0.14.3-beta
+ 
+ Take a look to: [bitcoin-core-config-generator](https://jlopp.github.io/bitcoin-core-config-generator/) for more settings about *bitcoin.conf*.
 
 ## Running all
-Run all with 
-
+This command will generate config files (env, bitcoin.conf, lnd.conf) and docker-compose file based on the settings you provided. 
+Then build docker images and run all containers. 
 ```
     bash start.sh  
 ```
+
+
 Connect to the bitcoin container where you can run **bitcoin-cli**
 ```
     make run-bitcoin
@@ -72,9 +76,9 @@ Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples.
 ## TODO: 
 - [X] Create new bitcoin.conf and lnd.conf on start 
 - [X] REGTEST
-- [ ]  Create multiple lnd nodes for regtest
+- [X]  Create multiple lnd nodes for regtest
 - [ ]  Connect 3 nodes on regtest to create a lightning network 
-- [ ]  Config file for fast configuration start-up -> gen new docker-compose.yml
+- [X]  Config file for fast configuration start-up -> gen new docker-compose.yml
 - [ ]  Make a multi-hop payment in jupyter notebook
 - [ ]  Tor on testnet
 - [ ]  Connect testnet node with N new peers

@@ -63,4 +63,5 @@ WORKDIR /home/lnd
 EXPOSE 9735 10009
 
 # ENTRYPOINT [ "/entrypoint.sh", "--network", "$BITCOIN_NETWORK" ]	
-CMD ["tail", "-f", "/dev/null"]
+# CMD ["tail", "-f", "/dev/null"]
+CMD ["lnd"]
