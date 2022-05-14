@@ -18,6 +18,6 @@ alias ll='ls -l'
 alias lh='ls -lh'
 alias la='ls -Al'
 
-export DATADIR="/home/bitcoin/"
-alias btd="bitcoind -datadir=$DATADIR"
+export DATADIR="/home/bitcoin/.bitcoin"
+alias bitcoind="bitcoind -datadir=$DATADIR"
 alias bitcoin-cli="bitcoin-cli -datadir=$DATADIR"

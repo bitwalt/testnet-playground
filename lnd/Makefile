@@ -1,26 +1,37 @@
 	
-NETWORK=testnet 
-T=-datadir=/home/bitcoin/
+NETWORK=regtest 
 
-
-list-peers:
- 	lncli --network=$(NETWORK) listpeers
+listpeers:
+	lncli -n=$(NETWORK) listpeers
 
 genaddress:
-	lncli --network=$(NETWORK) newaddress np2wkh 
+	lncli -n=$(NETWORK) newaddress p2wkh 
 
-docker-build:
-	docker build \
-	-t lnd_testnet \
-	.
+geninvoice:
+	lncli -n=$(NETWORK) addinvoice -amt $(AMOUNT) 
 
-docker-run:
-	docker run -it -d --rm --name lnd_testnet \
-	-p 9735:9735 	\
-	-p 18333:18333 \
-	--user "$(id -u):$(id -g)" \
-	-v $(PWD)/:.lnd \
-	lnd_testnet
+connect:
+	lncli -n=$(NETWORK) connect $(PEER)
 
-docker-attach:
-	docker attach --detach-keys="ctrl-a" lnd_testnet
+openchannel:
+	lncli -n=$(NETWORK) openchannel  $(PEER) $(AMOUNT)
+
+payinvoice:
+	lncli -n=$(NETWORK) payinvoice $(INVOICE)
+	
+
+# docker-build:
+# 	docker build \
+# 	-t lnd_testnet \
+# 	.
+
+# docker-run:
+# 	docker run -it -d --rm --name lnd_testnet \
+# 	-p 9735:9735 	\
+# 	-p 18333:18333 \
+# 	--user "$(id -u):$(id -g)" \
+# 	-v $(PWD)/:.lnd \
+# 	lnd_testnet
+
+# docker-attach:
+# 	docker attach --detach-keys="ctrl-a" lnd_testnet

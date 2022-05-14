@@ -43,6 +43,15 @@ run-bitcoin:
 run-lnd: 
 	docker exec -it lnd-test /bin/bash 
 
+run-alice: 
+	docker exec -it lnd-alice /bin/bash 
+
+run-bob: 
+	docker exec -it lnd-bob /bin/bash 
+
+run-charlie: 
+	docker exec -it lnd-charlie /bin/bash 
+
 run-pyclient: 
 	docker exec -it pyclient /bin/bash 
 

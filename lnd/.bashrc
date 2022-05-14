@@ -18,4 +18,4 @@ alias ll='ls -l'
 alias lh='ls -lh'
 alias la='ls -Al'
 
-alias lncli="lncli --lnddir=.lnd -n regtest"
+alias lncli="lncli -n regtest "

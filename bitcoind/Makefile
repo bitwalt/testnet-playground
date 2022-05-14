@@ -21,7 +21,7 @@ loadwallet:
 getinfo:
 	$(BITCOINCLI) $(T) -getinfo
 
-sendfrom:
+sendto:
 	$(BITCOINCLI) $(T) sendtoaddress $(ADDRESS) $(AMOUNT)
 
 genaddress:

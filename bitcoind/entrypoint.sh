@@ -39,10 +39,6 @@ if [ "$BITCOIN_NETWORK" == "regtest" ]; then
 	# Start mining
 	echo "Starting mining..."
 	source /mine.sh
-	# while true; do
-	# 	sleep 10 ; 
-	# done
-
 fi
 
 
