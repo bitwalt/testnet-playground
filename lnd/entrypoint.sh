@@ -1,17 +1,21 @@
 #!/bin/bash
-# set -Eeuo pipefail
+set -Eeuo pipefail
 
-# DATADIR=/home/lnd/.lnd
 BITCOIN_NETWORK="${NETWORK:-regtest}"
 
-# source scripts/wait-for-bitcoind.sh
-# echo Starting lnd...
-# lnd --lnddir=/lnd --noseedbackup > /dev/null &
 echo "Starting lnd in $BITCOIN_NETWORK mode..."
+
+# echo "Waiting for bitcoind to start..."
+# until curl --silent --user regtest:regtest --data-binary '{"jsonrpc": "1.0", "id": "lnd-node", "method": "getblockchaininfo", "params": []}' -H 'content-type: text/plain;' http://bitcoind:18443/ | jq -e ".result.blocks > 0" > /dev/null 2>&1
+# do
+# 	echo -n "."
+# 	sleep 1
+# done
+sleep 5
 
 if [ "$BITCOIN_NETWORK" == "regtest" ]; then
     lnd --noseedbackup > /dev/null &
-    sleep 5
+    
     until lncli -n $BITCOIN_NETWORK getinfo > /dev/null 2>&1
     do
         sleep 1
@@ -20,8 +24,10 @@ if [ "$BITCOIN_NETWORK" == "regtest" ]; then
     # Generate a new receiving address for LND wallet
     address=$(lncli -n $BITCOIN_NETWORK newaddress p2wkh | jq .address)
     echo "Funding address: $address"
-    # echo "Funding lnd wallet"
-    # source /usr/local/bin/fund-lnd.sh
+    echo "Copying macaroon and TLS certificate to share directory..."
+    cp -p /home/lnd/.lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon /home/lnd/share/
+    cp -p /home/lnd/.lnd/tls.cert /home/lnd/share/
+    echo "Done!"
 fi 
 
 exec tail -f /dev/null

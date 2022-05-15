@@ -17,6 +17,7 @@ BITCOIN_CONF_FILE="./templates/bitcoin.conf"
 LND_CONF_FILE="./templates/lnd.conf"
 TOR_CONF_FILE="./templates/torrc"
 ENV_FILE="./templates/.env"
+RPC_FILE="./pyclient/data/configs.py"
 REG_DOCKER_COMPOSE="./templates/reg-docker-compose.yml" 
 TEST_DOCKER_COMPOSE="./templates/test-docker-compose.yml"
 
@@ -46,6 +47,11 @@ if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${B
   echo "RPC credentials created.."
   echo "bitcoin_rpc_user: ${BITCOIN_RPC_USER}"
   echo "bitcoin_rpc_password: ${BITCOIN_RPC_PASS}"
+  echo "RPC_USER='${BITCOIN_RPC_USER}'" > "$RPC_FILE"
+  echo "RPC_PASS='${BITCOIN_RPC_PASS}'" >> "$RPC_FILE"
+  echo "NETWORK='${BITCOIN_NETWORK}'" >> "$RPC_FILE"
+  echo "BITCOIN_IP='${BITCOIN_IP}'" >> "$RPC_FILE"
+
 fi
 
 # Pull Tor image and generate Tor password
@@ -69,12 +75,9 @@ if [ "$BITCOIN_NETWORK" == "testnet" ]; then
   sed -i '' '1s/^/testnet=1\n[test]\n\n/' "$BITCOIN_CONF_FILE"
   # Switch LND to testnet
   sed -i '' "s/bitcoin.mainnet=1/bitcoin.testnet=1/g;" "$LND_CONF_FILE"
-  # Uncomment testnet neutrino block and peers
-#   sed -i '' "s/\# \[neutrino\]/\[neutrino\]/g;" "$LND_CONF_FILE"
-#   sed -i '' "s/\# neutrino.addpeer=testnet1-btcd.zaphq.io/neutrino.addpeer=testnet1-btcd.zaphq.io/g;" "$LND_CONF_FILE"
-#   sed -i '' "s/\# neutrino.addpeer=testnet2-btcd.zaphq.io/neutrino.addpeer=testnet2-btcd.zaphq.io/g;" "$LND_CONF_FILE"
   sed -i '' "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
-  
+  echo "RPC_PORT=$BITCOIN_RPC_PORT" >> "$RPC_FILE"
+  echo "P2P_PORT=$BITCOIN_P2P_PORT" >> "$RPC_FILE"
   # copy docker-compose file for testnet
   cp $TEST_DOCKER_COMPOSE "./docker-compose.yml"
 fi
@@ -92,6 +95,10 @@ if [ "$BITCOIN_NETWORK" == "regtest" ]; then
   sed -i '' "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
   # Disable tor
   sed -i '' "s/tor.active=1/tor.active=0/g;" "$LND_CONF_FILE"
+  
+  echo "RPC_PORT=$BITCOIN_RPC_PORT" >> "$RPC_FILE"
+  echo "P2P_PORT=$BITCOIN_P2P_PORT" >> "$RPC_FILE"
+  
   # copy docker-compose file for regtest
   cp $REG_DOCKER_COMPOSE "./docker-compose.yml"
 fi
@@ -161,3 +168,4 @@ mv -f "$LND_CONF_FILE" "./lnd/lnd.conf"
 # fi
 
 echo "Configuration successful!"
+

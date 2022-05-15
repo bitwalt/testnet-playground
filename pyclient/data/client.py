@@ -1,6 +1,6 @@
 import requests, codecs, json
 from time import sleep
-
+from configs import RPC_USER, RPC_PASS, BITCOIN_IP, NETWORK, RPC_PORT, P2P_PORT
 
 class RpcClient:
     def __init__(self, url):
@@ -17,7 +17,7 @@ class RpcClient:
 
 class BtcClient:
     def __init__(self):
-        self.rpc = RpcClient('http://regtest:regtest@127.0.0.1:18443')
+        self.rpc = RpcClient(f'http://{RPC_USER}:{RPC_PASS}@{BITCOIN_IP}:{RPC_PORT}')
     def __getattr__(self, method):
         def missing_method(*args, **kwargs):
             return self.rpc.call(method, *args)

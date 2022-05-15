@@ -77,11 +77,19 @@ Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples.
 - [X] Create new bitcoin.conf and lnd.conf on start 
 - [X] REGTEST
 - [X]  Create multiple lnd nodes for regtest
-- [ ]  Connect 3 nodes on regtest to create a lightning network 
+- [X]  Connect 3 nodes on regtest to create a lightning network 
 - [X]  Config file for fast configuration start-up -> gen new docker-compose.yml
 - [ ]  Make a multi-hop payment in jupyter notebook
 - [ ]  Tor on testnet
 - [ ]  Connect testnet node with N new peers
 - [ ]  Send sats on your testnet mobile wallet over LN 
 - [ ]  Submarine swap on regtest using python 
-  
+- [ ]  Recurrent payment on regtest using python
+
+## Donation 
+
+Please consider to donate some satoshis if you like this project and encourage me to develop more.
+    
+Lightning Network Address:
+`wallyyy@ln.tips`
+    

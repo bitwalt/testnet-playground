@@ -46,15 +46,15 @@ RUN sha256sum /bin/lnd /bin/lncli > /shasums.txt \
 RUN groupadd -r lnd \
 &&  useradd -r -g lnd lnd \
 &&  mkdir -p /home/lnd/.lnd \
+&& mkdir -p /home/lnd/share \
 &&  chown -R lnd:lnd /home/lnd
 
 # Copy scripts and configuration files
 COPY lnd.conf /home/lnd/.lnd/
 COPY Makefile /home/lnd/
 COPY .bashrc /home/lnd/.bashrc
-RUN . /home/lnd/.bashrc
 COPY entrypoint.sh /entrypoint.sh
-COPY scripts/ /scripts/
+COPY scripts/ /home/lnd/
 RUN chmod +x /entrypoint.sh	
 
 USER lnd
@@ -65,4 +65,3 @@ EXPOSE 9735 10009
 
 ENTRYPOINT [ "/entrypoint.sh", "--network", "$BITCOIN_NETWORK" ]	
 CMD ["tail", "-f", "/dev/null"]
-# CMD ["lnd"]
