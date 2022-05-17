@@ -54,7 +54,6 @@ COPY lnd.conf /home/lnd/.lnd/
 COPY Makefile /home/lnd/
 COPY .bashrc /home/lnd/.bashrc
 COPY entrypoint.sh /entrypoint.sh
-COPY scripts/ /home/lnd/
 RUN chmod +x /entrypoint.sh	
 
 USER lnd

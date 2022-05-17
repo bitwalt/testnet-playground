@@ -27,6 +27,8 @@ services:
         context: lnd
       restart: on-failure
       stop_grace_period: 5m30s
+      volumes:
+      - ./volumes/alice:/home/lnd/share
       ports:
         - "$LND_P2P_PORT:$LND_P2P_PORT"
         - "$LND_GRPC_PORT:$LND_GRPC_PORT"
@@ -39,6 +41,8 @@ services:
       build:
         context: lnd
       restart: on-failure
+      volumes:
+      - ./volumes/bob:/home/lnd/share
       stop_grace_period: 5m30s
       ports:
         - "$LND_P2P_PORT_B:$LND_P2P_PORT"
@@ -52,6 +56,9 @@ services:
         context: lnd
       restart: on-failure
       stop_grace_period: 5m30s
+      volumes:
+      - ./volumes/charlie:/home/lnd/share
+    
       ports:
         - "$LND_P2P_PORT_C:$LND_P2P_PORT"
       networks:
@@ -64,8 +71,9 @@ services:
     container_name: pyclient
     ports:
       - "$JUPYTER_PORT:$JUPYTER_PORT"
-    # volumes:
-    #   - ./pyclient:/home/pyclient
+    volumes:
+      - ./pyclient:/home/pyclient
+      - ./volumes:/lnd_share
     networks:
       default:
           ipv4_address: $PYC_IP

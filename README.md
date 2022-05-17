@@ -92,4 +92,6 @@ Please consider to donate some satoshis if you like this project and encourage m
     
 Lightning Network Address:
 `wallyyy@ln.tips`
+BTC Address:
+`bc1qsm5vl8q4kc75gkwvn6w284mg0q26fr9rgu5n4m`
     

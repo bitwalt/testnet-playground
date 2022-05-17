@@ -4,6 +4,7 @@ bitcoind/testnet/testnet3/
 bitcoind/regtest/
 *.bitcoin.conf
 *.lnd.conf
+tor/torrc
 lnd/.lnd
 # Bitcoin files
 *.dat
