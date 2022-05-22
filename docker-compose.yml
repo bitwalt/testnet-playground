@@ -25,6 +25,8 @@ services:
       container_name: lnd-alice
       build:
         context: lnd
+        args:
+          LND_IP: $LND_IP
       restart: on-failure
       stop_grace_period: 5m30s
       volumes:
@@ -41,6 +43,8 @@ services:
       container_name: lnd-bob
       build:
         context: lnd
+        args:
+          LND_IP: $LND_IP_BOB
       restart: on-failure
       volumes:
       - ./volumes/bob:/home/lnd/share
@@ -56,15 +60,15 @@ services:
       container_name: lnd-charlie
       build:
         context: lnd
+        args:
+          LND_IP: $LND_IP_CHARLIE
       restart: on-failure
       stop_grace_period: 5m30s
       volumes:
-      - ./volumes/charlie:/home/lnd/share
-    
+      - ./volumes/charlie:/home/lnd/share 
       ports:
         - "$LND_P2P_PORT_C:$LND_P2P_PORT"
         - "$LND_REST_PORT_C:$LND_REST_PORT"
-
       networks:
         default:
             ipv4_address: $LND_IP_CHARLIE
@@ -76,7 +80,7 @@ services:
     ports:
       - "$JUPYTER_PORT:$JUPYTER_PORT"
     volumes:
-      - ./pyclient:/app
+      - ./pyclient/code:/home/pyclient/code
       - ./volumes:/lnd_share
     networks:
       default:

@@ -41,7 +41,8 @@ RUN sha256sum /bin/lnd /bin/lncli > /shasums.txt \
   && cat /shasums.txt
 
 #- - - - - - -
-
+ARG LND_IP
+ENV IP=${LND_IP}
 # Create group and user for LND
 RUN groupadd -r lnd \
 &&  useradd -r -g lnd lnd \
@@ -53,6 +54,7 @@ RUN groupadd -r lnd \
 COPY lnd.conf /home/lnd/.lnd/
 COPY Makefile /home/lnd/
 COPY .bashrc /home/lnd/.bashrc
+COPY env /home/lnd/.env
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh	
 
@@ -62,5 +64,5 @@ WORKDIR /home/lnd
 # Expose lnd ports (p2p, rpc).
 EXPOSE 9735 10009
 
-ENTRYPOINT [ "/entrypoint.sh", "--network", "$BITCOIN_NETWORK" ]	
+ENTRYPOINT [ "/entrypoint.sh", "--network", "$BITCOIN_NETWORK"]	
 CMD ["tail", "-f", "/dev/null"]

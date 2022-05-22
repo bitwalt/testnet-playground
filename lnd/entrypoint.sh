@@ -3,24 +3,28 @@ set -Eeuo pipefail
 
 BITCOIN_NETWORK="${NETWORK:-regtest}"
 
+# LOAD ENV VARS
+CONFIG_FILE="/home/lnd/.env"
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
+
 echo "Starting lnd in $BITCOIN_NETWORK mode..."
 
-# echo "Waiting for bitcoind to start..."
-# until curl --silent --user regtest:regtest --data-binary '{"jsonrpc": "1.0", "id": "lnd-node", "method": "getblockchaininfo", "params": []}' -H 'content-type: text/plain;' http://bitcoind:18443/ | jq -e ".result.blocks > 0" > /dev/null 2>&1
-# do
-# 	echo -n "."
-# 	sleep 1
-# done
-sleep 5
+echo "Waiting for bitcoind to start..."
+until curl --silent --user $BITCOIN_RPC_USER:$BITCOIN_RPC_PASS --data-binary '{"jsonrpc": "1.0", "id": "lnd-node", "method": "getblockchaininfo", "params": []}' -H 'content-type: text/plain;' http://$BITCOIN_IP:$BITCOIN_RPC_PORT/ | jq -e ".result.blocks > 0" > /dev/null 2>&1
+do
+	echo -n "."
+	sleep 1
+done
+echo "Startup complete"
 
 if [ "$BITCOIN_NETWORK" == "regtest" ]; then
-    lnd --noseedbackup > /dev/null &
+    echo "Running LND with IP: $IP"
+    lnd --tlsextraip=$IP --noseedbackup > /dev/null &
     
     until lncli -n $BITCOIN_NETWORK getinfo > /dev/null 2>&1
     do
         sleep 1
     done
-    echo "Startup complete"
     # Generate a new receiving address for LND wallet
     address=$(lncli -n $BITCOIN_NETWORK newaddress p2wkh | jq .address)
     echo "Funding address: $address"

@@ -1,34 +1,37 @@
-FROM ubuntu
+FROM python:3.10-bullseye
 
-ENV DEBCONF_NOWARNINGS yes
-ENV DEBIAN_FRONTEND noninteractive
+ENV PYTHONUNBUFFERED=1
 
-# Install dependencies
-RUN apt-get update --fix-missing -y \
-&&  apt-get upgrade -y
+RUN apt-get update && apt-get install --no-install-recommends -y \
+git make curl wget nano \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y \
-    python3.9  python3-pip   \
-    git curl \ 
-    &&  apt-get clean \
-    &&  rm -rf /var/lib/apt/lists/*
+RUN useradd --create-home pyclient
 
-RUN groupadd -r pyclient &&  useradd -r -s /sbin/nologin -g pyclient pyclient 
-ENV PATH $PATH:/home/pyclient/.local/bin
-WORKDIR /home/pyclient
+# install requirements
+COPY conf/requirements.txt .
+RUN python -m pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-RUN git clone https://github.com/googleapis/googleapis.git
-COPY data/requirements.txt /home/pyclient
-RUN pip3 install -r requirements.txt
-COPY .bashrc /home/pyclient/
+RUN mkdir /home/pyclient/code
+WORKDIR /home/pyclient/code
+ENV PATH="/home/pyclient/.local/bin:$PATH"
 
 # Get lnd lightning.proto file 
-RUN curl -o lightning.proto -s https://raw.githubusercontent.com/lightningnetwork/lnd/master/lnrpc/lightning.proto
+RUN wget https://raw.githubusercontent.com/lightningnetwork/lnd/master/lnrpc/lightning.proto
+
+RUN git clone https://github.com/googleapis/googleapis.git
 # Compile proto file
 RUN python3 -m grpc_tools.protoc --proto_path=googleapis:. --python_out=. --grpc_python_out=. lightning.proto
 
-COPY data /home/pyclient
+# COPY code .
+COPY .bashrc /home/pyclient/.bashrc
 
-EXPOSE 8888
+# COPY entrypoint.sh /entrypoint.sh
+# RUN chmod +x /entrypoint.sh	
 
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
+EXPOSE 8888 8889
+
+# ENTRYPOINT [ "/entrypoint.sh",  "--jupyter_port", "$JUPYTER_PORT"]
+CMD ["jupyter", "notebook", "--no-browser", "--ip=0.0.0.0", "--port=8889", "--allow-root"]
+# CMD ["tail", "-f", "/dev/null"]
