@@ -55,8 +55,8 @@ Connect to the lnd container where you can run **lncli**
 ```
     make run-lnd
 ```
-Check on the logs the url for connectiong to Jupyter notebook
 
+Check docker-compose logs for Jupyter notebook token-url
 
 ### Running Bitcoin Core only
 Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples. 
@@ -72,27 +72,22 @@ Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples.
 - [bitcoin-testnet-box](https://github.com/freewil/bitcoin-testnet-box)
 - [MasteringTheLightningNetwork docker](https://github.com/lnbook/lnbook/tree/develop/code/docker)
 
-## TODO: 
+## TODO:
+
+#### REGTEST
 - [X] Create new bitcoin.conf and lnd.conf on start 
-- [X] REGTEST
 - [X]  Create multiple lnd nodes for regtest
 - [X]  Connect 3 nodes on regtest to create a lightning network 
 - [X]  Config file for fast configuration start-up -> gen new docker-compose.yml
 - [X]  Make a multi-hop payment in jupyter notebook
+- [ ]  Submarine swap on regtest using python 
+- [ ]  Periodic payment on a regtest channel using python
+- [ ]  Handle different LN implementatios: c-lightning (C), LNP-BP (Rust)
+- [ ]  RGB Client-side-validation for smart contracts
+
+#### TESTNET
 - [ ]  Tor on testnet
 - [ ]  Connect testnet node with N new peers
-- [ ]  Multi-hop payment over testnet using mobile wallet
-- [ ]  Submarine swap on regtest using python 
-- [ ]  Periodic payment on regtest channel using python
-- [ ]  Handle different LN implementatios: c-lightning (C), LNP-BP (Rust)
-- [ ]  RGB Client-side-validation for enabling smart contracts
-  
-## Donation 
+- [ ]  LN Multi-hop payment on testnet using mobile wallet
 
-Please consider to donate some satoshis if you like this project or if you would like to encourage me to develop more
-    
-Lightning Network Address:
-`wallyyy@ln.tips`
-BTC Address:
-`bc1qsm5vl8q4kc75gkwvn6w284mg0q26fr9rgu5n4m`
-    
+
