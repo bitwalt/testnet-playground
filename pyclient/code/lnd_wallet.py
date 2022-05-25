@@ -1,7 +1,7 @@
 from time import sleep
 import codecs
-import rpc_pb2 as ln
-import rpc_pb2_grpc as lnrpc
+import lightning_pb2 as ln
+import lightning_pb2_grpc as lnrpc
 from loguru import logger
 import grpc
 import os
@@ -17,19 +17,16 @@ class LightningWallet:
         self.name = name
         self.host = host
         self.port = port
+        self.macaroon_path = os.path.expanduser(f'/lnd_share/{self.name}/admin.macaroon')
+        self.certificate_path = os.path.expanduser(f'/lnd_share/{self.name}/tls.cert')
         
-        
-    def connect_to_node(self, host="localhost", port=10009, use_macaroon=True):
-        # Lnd cert is at ~/.lnd/tls.cert on Linux and
-        # ~/Library/Application Support/Lnd/tls.cert on Mac
-        cert = open(os.path.expanduser('~/.lnd/tls.cert'), 'rb').read()
+    def connect(self, use_macaroon=True):
+        cert = open(self.certificate_path, 'rb').read()
         cert_creds = grpc.ssl_channel_credentials(cert)
         if use_macaroon:        
-            # Encryption and authentication
             auth_creds = grpc.metadata_call_credentials(self.metadata_callback)
             cert_creds = grpc.composite_channel_credentials(cert_creds, auth_creds)
-        
-        self.channel = grpc.secure_channel(f'{host}:{str(port)}', cert_creds)
+        self.channel = grpc.secure_channel(f'{self.host}:{str(self.port)}', cert_creds)
         self.stub = lnrpc.LightningStub(self.channel)
         logger.info("Connected to LND node")
     
@@ -42,10 +39,8 @@ class LightningWallet:
 
 
     def get_macaroon(self):
-        # Lnd admin macaroon is at ~/.lnd/data/chain/bitcoin/simnet/admin.macaroon on Linux and
-        # ~/Library/Application Support/Lnd/data/chain/bitcoin/simnet/admin.macaroon on Mac
         macaroon = None
-        with open(os.path.expanduser('~/.lnd/data/chain/bitcoin/simnet/admin.macaroon'), 'rb') as f:
+        with open(self.macaroon_path, 'rb') as f:
             macaroon_bytes = f.read()
             macaroon = codecs.encode(macaroon_bytes, 'hex')
         return macaroon

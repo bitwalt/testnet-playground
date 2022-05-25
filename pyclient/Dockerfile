@@ -14,7 +14,8 @@ RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN mkdir /home/pyclient/code
-WORKDIR /home/pyclient/code
+RUN mkdir /home/pyclient/grpc
+WORKDIR /home/pyclient/grpc
 ENV PATH="/home/pyclient/.local/bin:$PATH"
 
 # Get lnd lightning.proto file 
@@ -27,6 +28,7 @@ RUN python3 -m grpc_tools.protoc --proto_path=googleapis:. --python_out=. --grpc
 # COPY code .
 COPY .bashrc /home/pyclient/.bashrc
 
+WORKDIR /home/pyclient/
 # COPY entrypoint.sh /entrypoint.sh
 # RUN chmod +x /entrypoint.sh	
 

@@ -1,8 +1,8 @@
 .project
 .DS_Store
-bitcoind/testnet/testnet3/
-bitcoind/regtest/
-*.bitcoin.conf
+bitcoind/bitcoin.conf
+lnd/lnd.conf
+lnd/env
 *.lnd.conf
 tor/torrc
 lnd/.lnd
