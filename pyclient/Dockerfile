@@ -9,7 +9,7 @@ git make curl wget nano \
 RUN useradd --create-home pyclient
 
 # install requirements
-COPY conf/requirements.txt .
+COPY requirements.txt .
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 

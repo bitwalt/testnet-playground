@@ -1,5 +1,5 @@
 RPC_USER='bitcoin'
-RPC_PASS='D3yIgZ7nz22ZiMGutfGQqLt7m8O8NfpVs2bHtjb4UTw='
+RPC_PASS='x-B1vqQ6oBcrm7ftVqBOBCQnO13ghRHEusxto1BxaNw='
 NETWORK='regtest'
 BITCOIN_IP='10.21.21.8'
 LND_IP='10.21.21.9'

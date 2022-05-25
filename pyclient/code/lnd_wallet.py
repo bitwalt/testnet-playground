@@ -1,3 +1,6 @@
+import sys
+# sys.path.insert(0, 'grpc')
+
 from time import sleep
 import codecs
 import lightning_pb2 as ln
@@ -19,6 +22,7 @@ class LightningWallet:
         self.port = port
         self.macaroon_path = os.path.expanduser(f'/lnd_share/{self.name}/admin.macaroon')
         self.certificate_path = os.path.expanduser(f'/lnd_share/{self.name}/tls.cert')
+        self.connect()
         
     def connect(self, use_macaroon=True):
         cert = open(self.certificate_path, 'rb').read()
@@ -36,7 +40,6 @@ class LightningWallet:
             raise Exception("Macaroon doesn't exist")
         else:
             callback([('macaroon', macaroon)], None)
-
 
     def get_macaroon(self):
         macaroon = None
@@ -67,12 +70,12 @@ class LightningWallet:
         return response.total_balance
 
 
-    def request_generator(dest, amt):
+    def request_generator(self, dest, amount):
         # Initialization code here
         counter = 0
         print("Starting up")
         while True:
-            request = ln.SendRequest(dest=dest, amt=amt,)
+            request = ln.SendRequest(dest=dest, amt=amount,)
             yield request
             counter += 1
             sleep(2)
@@ -81,14 +84,14 @@ class LightningWallet:
     def create_streaming_payment(self, dest_pub_key_hex, amount=100):
         # Outputs from lncli are hex-encoded
         dest_bytes = codecs.decode(dest_pub_key_hex, 'hex')
-        request_iterable = self.request_generator(dest=dest_bytes, amt=amount)
+        request_iterable = self.request_generator(dest=dest_bytes, amount=amount)
         for payment in self.stub.SendPayment(request_iterable):
             print(payment)
-    
+            sleep(2)
     
 if __name__ == '__main__':
     lnd_wallet  = LightningWallet("lnd_wallet", "localhost", 10008)
     # Connect to Bob securely
-    lnd_wallet.connect_to_node("localhost", 10009, use_macaroon=True)
+    lnd_wallet.connect("localhost", 10009, use_macaroon=True)
     # Connect to Charlie not securely
-    lnd_wallet.connect_to_node("localhost", 10010, use_macaroon=False)
+    lnd_wallet.connect("localhost", 10010, use_macaroon=False)
