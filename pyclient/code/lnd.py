@@ -4,8 +4,8 @@ import os
 
 import grpc
 
-import rpc_pb2 as ln
-import rpc_pb2_grpc as lnrpc
+import grpc_lnd.lightning_pb2 as ln
+import grpc_lnd.lightning_pb2_grpc as lnrpc
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s', )
 logger = logging.getLogger('main')
@@ -41,7 +41,7 @@ BOB_DOCKER = {
 }
 
 
-class RpcClient(object):
+class LndClient(object):
     identity_pubkey = None
 
     def __repr__(self):
@@ -114,6 +114,7 @@ class RpcClient(object):
             logger.exception(e)
 
     def getnode_info(self, pubkey):
+        # Check if pubkey is a peer
         try:
             response = self.client.GetNodeInfo(ln.NodeInfoRequest(pub_key=pubkey))
             return response

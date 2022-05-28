@@ -1,6 +1,7 @@
 .project
 .DS_Store
 bitcoind/bitcoin.conf
+
 lnd/lnd.conf
 lnd/env
 *.lnd.conf

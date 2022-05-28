@@ -1,39 +1,37 @@
 FROM python:3.10-bullseye
 
 ENV PYTHONUNBUFFERED=1
-
+# Install dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
 git make curl wget nano \
 && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home pyclient
 
-# install requirements
+# Install python requirements
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
-
-RUN mkdir /home/pyclient/code
-RUN mkdir /home/pyclient/grpc
-WORKDIR /home/pyclient/grpc
 ENV PATH="/home/pyclient/.local/bin:$PATH"
 
+# Install gRPC lnd
+RUN mkdir -p /home/pyclient/code/grpc_lnd
+WORKDIR /home/pyclient/code/
 # Get lnd lightning.proto file 
 RUN wget https://raw.githubusercontent.com/lightningnetwork/lnd/master/lnrpc/lightning.proto
-
-RUN git clone https://github.com/googleapis/googleapis.git
+RUN mv lightning.proto grpc_lnd
 # Compile proto file
-RUN python3 -m grpc_tools.protoc --proto_path=googleapis:. --python_out=. --grpc_python_out=. lightning.proto
+RUN python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. grpc_lnd/lightning.proto
+RUN mv grpc_lnd ..
 
-# COPY code .
 COPY .bashrc /home/pyclient/.bashrc
 
-WORKDIR /home/pyclient/
-# COPY entrypoint.sh /entrypoint.sh
-# RUN chmod +x /entrypoint.sh	
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh	
 
 EXPOSE 8888 8889
+ENTRYPOINT [ "/entrypoint.sh",  "--jupyter_port", "$JUPYTER_PORT"]
 
-# ENTRYPOINT [ "/entrypoint.sh",  "--jupyter_port", "$JUPYTER_PORT"]
-CMD ["jupyter", "notebook", "--no-browser", "--ip=0.0.0.0", "--port=8889", "--allow-root"]
-# CMD ["tail", "-f", "/dev/null"]
+USER pyclient
+
+CMD ["tail", "-f", "/dev/null"]

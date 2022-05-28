@@ -16,22 +16,25 @@ class RpcClient:
         return res['result']
 
 class BtcClient:
-    def __init__(self, user, password, host, port):
-        self.user = user
-        self.password = password
-        self.host = host
-        self.port = port
-        self.rpc = RpcClient(f'http://{user}:{password}@{host}:{port}')
+    def __init__(self, conf):
+        self.rpc_user = conf['rpc_user']
+        self.rpc_pass = conf['rpc_pass']
+        self.host = conf['host']
+        self.port = conf['port']
+        self.rpc = RpcClient(f'http://{self.rpc_user}:{self.rpc_pass}@{self.host}:{self.port}')
         
     def __getattr__(self, method):
         def missing_method(*args, **kwargs):
             return self.rpc.call(method, *args)
         return missing_method
+    
     def generate(self, n, wait_sec=2):
         address = self.rpc.call('getnewaddress')
         blocks  = self.rpc.call('generatetoaddress', n, address)
         sleep(wait_sec)
         return blocks
+    
+
 
 enc = lambda path: codecs.encode(open(path, 'rb').read(), 'hex')
 

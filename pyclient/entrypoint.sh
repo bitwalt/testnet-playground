@@ -1,12 +1,11 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-echo "Starting Jupyter notebook..."
+# Copy generated gRPC lnd to code folder
+cp -r /home/pyclient/grpc_lnd /home/pyclient/code/
 
-JUPYTER_PORT="${JUPYTER_PORT:-8888}"
+echo "Starting Jupyter notebook..."
+JUPYTER_PORT="${JUPYTER_PORT:-8889}"
 
 # Start Jupyter notebook
-jupyter notebook --no-browser --port=$JUPYTER_PORT --ip=0.0.0.0 # --allow-root 
-
-# --NotebookApp.allow_origin=* --NotebookApp.allow_remote_access=1
-exec tail -f /dev/null
+jupyter notebook --no-browser --port=$JUPYTER_PORT --ip=0.0.0.0 --allow-root 
