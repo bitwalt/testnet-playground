@@ -1,6 +1,7 @@
 import codecs
 import logging
 import os
+from dataclasses import dataclass
 
 import grpc
 
@@ -40,16 +41,21 @@ BOB_DOCKER = {
     'admin_macaroon': '/Users/cherijs/.docker_volumes/simnet/bob/data/chain/bitcoin/regtest/admin.macaroon'
 }
 
+@dataclass
+class PeerInfo:
+    pubkey: str
+    host: str
+    port: int = 9735
 
 class LndClient(object):
-    identity_pubkey = None
+    pubkey = None
 
     def __repr__(self):
         return self.displayName
 
     def __init__(self, config):
         self.displayName = config['name']
-
+        self.host = config['node_host']
         with open(config['tls_cert'], 'rb') as tls_cert_file:
             cert_credentials = grpc.ssl_channel_credentials(tls_cert_file.read())
 
@@ -72,7 +78,7 @@ class LndClient(object):
 
             self.client = lnrpc.LightningStub(channel)
 
-            self.identity_pubkey = self.getinfo().identity_pubkey
+            self.pubkey = self.getinfo().identity_pubkey
 
     @staticmethod
     def get_macaroon_credentials(macaroon):

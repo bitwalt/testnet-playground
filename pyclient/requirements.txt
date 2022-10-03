@@ -4,3 +4,5 @@ grpcio-tools
 googleapis-common-protos
 jupyterlab
 loguru
+schedule
+lndgrpc

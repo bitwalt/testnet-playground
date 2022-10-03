@@ -36,6 +36,7 @@ TEST_DOCKER_COMPOSE="./templates/test-docker-compose.yml"
 ##########################################################
 ############ Generate configuration variables ############
 ##########################################################
+echo "# DO NOT WRITE - IT WILL BE OVERWRITTE" > "$RPC_FILE"
 
 # Generate RPC credentials
 if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${BITCOIN_RPC_AUTH+x} ]]; then
@@ -47,7 +48,7 @@ if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${B
   echo "RPC credentials created.."
   echo "bitcoin_rpc_user: ${BITCOIN_RPC_USER}"
   echo "bitcoin_rpc_password: ${BITCOIN_RPC_PASS}"
-  echo "RPC_USER='${BITCOIN_RPC_USER}'" > "$RPC_FILE"
+  echo "RPC_USER='${BITCOIN_RPC_USER}'" >> "$RPC_FILE"
   echo "RPC_PASS='${BITCOIN_RPC_PASS}'" >> "$RPC_FILE"
   echo "NETWORK='${BITCOIN_NETWORK}'" >> "$RPC_FILE"
   echo "BITCOIN_IP='${BITCOIN_IP}'" >> "$RPC_FILE"

@@ -82,9 +82,13 @@ Read [bitcoin-testnet-box README.md](bitcoind/README.md) for more info/examples.
 - [X]  Make a multi-hop payment in jupyter notebook
 - [ ]  Submarine swap on regtest using python 
 - [ ]  Periodic payment on a regtest channel using python
+  
 - [ ]  Handle different LN implementatios: c-lightning (C), LNP-BP (Rust)
 - [ ]  RGB Client-side-validation for smart contracts
+- [ ]  Move from regtest to simnet
 
+
+- [ ] Bitcoind Python bindings
 #### TESTNET
 - [ ]  Tor on testnet
 - [ ]  Connect testnet node with N new peers
